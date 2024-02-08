@@ -27,6 +27,36 @@
   </div>
 </template>
 
+<script>
+import axios from 'axios';
+import Cookies from 'js-cookie';
+
+export default {
+  data() {
+    return {
+      username: '',
+      password: ''
+    };
+  },
+  methods: {
+    async login() {
+      try {
+        const response = await axios.post(`http://localhost:8081/api/v1/login?username=${this.username}&password=${this.password}`);
+
+        if (response.data) {
+          Cookies.set('token', response.data);
+          console.log('Token guardado:', Cookies.get('token'));
+        } else {
+          console.log('No se recibió ningún token');
+        }
+      } catch (error) {
+        console.error('Error al hacer login:', error);
+      }
+    }
+  }
+};
+</script>
+
 <style scoped>
 .logo-container {
   width: 120px;
