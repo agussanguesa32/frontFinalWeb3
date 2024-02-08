@@ -6,29 +6,30 @@
             <thead>
               <tr>
                 <th></th>
-                <th @click="toggleSort('orden')">Orden
+                <th @click="toggleSort('orden')">Id
                   <span v-if="sortKey === 'orden' && sortAsc">↑</span>
                   <span v-else-if="sortKey === 'orden' && !sortAsc">↓</span>
                 </th>
-                <th @click="toggleSort('estado')">Estado
-                  <span v-if="sortKey === 'estado' && sortAsc">↑</span>
-                  <span v-else-if="sortKey === 'estado' && !sortAsc">↓</span>
-                </th>
+                <th>Fecha</th>
                 <th>Pesaje Inicial</th>
                 <th>Pesaje Final</th>
                 <th>Producto Cargado</th>
+                <th>Caudal Promedio</th>
+                <th>Densidad Promedio</th>
                 <th>Temperatura Promedio</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(order, index) in sortedOrders" :key="index" :class="{ 'selected-row': order.selected }">
                 <td><input type="checkbox" v-model="order.selected"></td>
-                <td>{{ order.orden }}</td>
-                <td>{{ order.estado }}</td>
-                <td>{{ order.pesajeInicial }}</td>
-                <td>{{ order.pesajeFinal }}</td>
-                <td>{{ order.productoCargado }}</td>
-                <td>{{ order.temperaturaPromedio }}</td>
+                <td>{{ conciliation.id }}</td>
+                <td>{{ conciliarion.fecha }}</td>
+                <td>{{ conciliation.pesajeInicial }}</td>
+                <td>{{ conciliation.pesajeFinal }}</td>
+                <td>{{ conciliation.productoCargado }}</td>
+                <td>{{ conciliation.promedioCaudal }}</td>
+                <td>{{ conciliation.promedioDensidad }}</td>
+                <td>{{ conciliation.promedioTemperatura }}</td>
               </tr>
             </tbody>
           </table>

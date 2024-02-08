@@ -399,10 +399,10 @@ export default {
     async obtainOrders() {
       try {
         const response = await axios.get(
-          "http://localhost:9080/api/v1/orders/list",
+          `${process.env.VUE_APP_API_URL}/orders/list`,
           {
             headers: {
-              Authorization: "Bearer " + Cookies.get("token"),
+              Authorization: `Bearer ${Cookies.get("token")}`,
             },
           }
         );

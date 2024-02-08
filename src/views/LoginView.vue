@@ -7,7 +7,7 @@
         </div>
         <div class="card mt-4">
           <div class="card-body">
-            <form @submit.prevent="login">
+            <form @submit.prevent="submitLogin()">
               <div class="form-group text-left">
                 <label for="username" class="form-label">Usuario</label>
                 <input type="text" class="form-control" id="username" v-model="username">
@@ -31,6 +31,7 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { toast } from 'vue3-toastify';
+import { mapMutations } from 'vuex';
 
 export default {
   data() {
@@ -40,19 +41,24 @@ export default {
     };
   },
   methods: {
-    async login() {
+    ...mapMutations([
+      'login'
+    ]),
+    async submitLogin() {
       try {
         const response = await axios.post(`${process.env.VUE_APP_API_URL}/login?username=${this.username}&password=${this.password}`);
 
-        if (response.data) {
-          Cookies.set('token');
+        if (response.data && typeof response.data !== 'undefined') {
+          Cookies.set('token', response.data);
+          this.login(response.data);
           toast.success('Ha iniciado sesion correctamente');
           setTimeout(() => {
             this.$router.push('/ordenes');
-          }, 2000);
+          }, 1000);
           console.log('Token guardado:', Cookies.get('token'));
         } else {
           console.log('No se recibió ningún token');
+          toast.error('Hubo un error interno. Por favor, inténtalo de nuevo más tarde.');
         }
       } catch (error) {
         console.error('Error al hacer login:', error);
