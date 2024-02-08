@@ -4,7 +4,7 @@
         <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a class="nav-link" href="/orders">Ordenes</a>
+              <a class="nav-link" href="/ordenes">Ordenes</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/cargas-actuales">Cargas Actuales</a>

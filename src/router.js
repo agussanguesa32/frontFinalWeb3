@@ -1,12 +1,16 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Ordenes from './views/OrderView.vue'
-//import CargasActuales from './views/CargasActuales.vue'
-//import Conciliaciones from './views/Conciliaciones.vue'
+import OrderView from './views/OrderView.vue'
+import ActualChargesView from './views/ActualChargesView.vue'
+import ConciliationsView from './views/ConciliationsView.vue'
+import LoginView from './views/LoginView.vue'
+
 
 const routes = [
-  { path: '/orders', component: Ordenes },
-  //{ path: '/cargas-actuales', component: CargasActuales },
-  //{ path: '/conciliaciones', component: Conciliaciones },
+  { path: '/ordenes', component: OrderView },
+  { path: '/cargas-actuales', component: ActualChargesView },
+  { path: '/conciliaciones', component: ConciliationsView },
+  { path: '/login', component: LoginView },
+
 ]
 
 const router = createRouter({
