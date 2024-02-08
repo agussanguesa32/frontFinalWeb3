@@ -21,13 +21,10 @@ router.beforeEach((to, from, next) => {
   const token = Cookies.get('token');
 
   if (to.path === '/login' && token) {
-    // Si el usuario está logueado y está intentando navegar a '/login', redirigir a '/ordenes'
     next('/ordenes');
   } else if (!token && to.path !== '/login') {
-    // Si el usuario no está logueado y está intentando navegar a cualquier ruta que no sea '/login', redirigir a '/login'
     next('/login');
   } else {
-    // En cualquier otro caso, permitir la navegación
     next();
   }
 });
