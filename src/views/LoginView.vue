@@ -30,6 +30,7 @@
 <script>
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { toast } from 'vue3-toastify';
 
 export default {
   data() {
@@ -41,16 +42,21 @@ export default {
   methods: {
     async login() {
       try {
-        const response = await axios.post(`http://localhost:8081/api/v1/login?username=${this.username}&password=${this.password}`);
+        const response = await axios.post(`${process.env.VUE_APP_API_URL}/login?username=${this.username}&password=${this.password}`);
 
         if (response.data) {
-          Cookies.set('token', response.data);
+          Cookies.set('token');
+          toast.success('Ha iniciado sesion correctamente');
+          setTimeout(() => {
+            this.$router.push('/ordenes');
+          }, 2000);
           console.log('Token guardado:', Cookies.get('token'));
         } else {
           console.log('No se recibió ningún token');
         }
       } catch (error) {
         console.error('Error al hacer login:', error);
+        toast.error('Los datos de inicio de sesión no son válidos');
       }
     }
   }
