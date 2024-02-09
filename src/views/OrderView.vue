@@ -7,7 +7,6 @@
           <table class="table">
     <thead>
       <tr>
-        <th></th>
         <th @click="toggleSort('orden')">
           Orden
           <span v-if="sortKey === 'orden' && sortAsc">↑</span>
@@ -32,12 +31,6 @@
         :class="{ 'selected-row': selectedOrder === order }"
         @click="selectedOrder = order"
       >
-        <td>
-          <label class="custom-checkbox">
-            <input type="radio" :value="order" v-model="selectedOrder" name="orderSelection" class="hidden"/>
-            <span class="checkmark" :class="{ 'checked': selectedOrder === order }"></span>
-          </label>
-        </td>
         <td>{{ order.id }}</td>
         <td>
         {{ order.estado }}
@@ -872,51 +865,6 @@ openModal(modalId, validateSelection = true) {
   background-color: red;
 }
 
-.hidden {
-  display: none;
-}
-
-.custom-checkbox {
-  display: block;
-  position: relative;
-  padding-left: 35px;
-  cursor: pointer;
-  user-select: none;
-}
-
-.checkmark {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 25px;
-  width: 25px;
-  background-color: #eee;
-  border: 1px solid #ddd;
-}
-
-.checkmark:after {
-  content: "";
-  position: absolute;
-  display: none;
-}
-
-.custom-checkbox input:checked ~ .checkmark {
-  background-color: white;
-}
-
-.custom-checkbox input:checked ~ .checkmark:after {
-  display: block;
-}
-
-.custom-checkbox .checkmark:after {
-  left: 9px;
-  top: 5px;
-  width: 5px;
-  height: 10px;
-  border: solid black;
-  border-width: 0 3px 3px 0;
-  transform: rotate(45deg);
-}
 .table tbody tr:hover td {
   background-color: gray !important; /* Cambia esto al color gris que prefieras */
 }
