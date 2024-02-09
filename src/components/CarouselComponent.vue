@@ -26,15 +26,15 @@ export default {
       images: [
         {
           id: 1,
-          src: `https://picsum.photos/1024/480/?random&time=${Date.now()}`,
+          src: `https://www.busesycamioneschevrolet.com.co/wp-content/uploads/2022/02/banner-camiones-familia-n-min.png`,
         },
         {
           id: 2,
-          src: `https://picsum.photos/1024/480/?random&time=${Date.now() + 1}`,
+          src: `https://www.busesycamioneschevrolet.com.co/wp-content/uploads/2022/02/banner-camiones-familia-f.jpg}`,
         },
         {
           id: 3,
-          src: `https://picsum.photos/1024/480/?random&time=${Date.now() + 2}`,
+          src: `https://i.pinimg.com/originals/a2/3a/a9/a23aa91c58f44ed000a33232c3f17332.jpg`,
         },
       ],
     };

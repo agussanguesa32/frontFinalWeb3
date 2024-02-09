@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container blackButtons">
     <div class="row justify-content-center align-items-center">
       <div class="col-md-6 text-center">
         <div class="rounded-circle logo-container mt-4" style="background-color: #6F42C1;">
@@ -17,7 +17,7 @@
                 <input type="password" class="form-control" id="password" v-model="password">
               </div>
               <div class="d-flex justify-content-center mt-3">
-                <button type="submit" class="btn btn-primary" style="background-color: #6F42C1;">Login</button>
+                <button type="submit" class="btn btn-primary">Login</button>
               </div>
             </form>
           </div>

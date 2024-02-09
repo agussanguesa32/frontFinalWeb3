@@ -17,7 +17,7 @@
       <a v-if="!isLoggedIn" class="nav-link" href="/login">
         <i class="bi bi-person-fill fs-3"></i>
       </a>
-      <button v-if="isLoggedIn" class="btn btn-danger" @click="logout">Cerrar Sesion</button>
+      <button v-if="isLoggedIn" class="btn btn-danger" @click="logout" id="logoutButton">Cerrar Sesion</button>
     </div>
   </nav>
 </template>
@@ -49,7 +49,7 @@ export default {
 
 <style scoped>
 .custom-navbar {
-  background-color: #6f42c1;
+  background-color: black;
   color: white;
 }
 .nav-link {
@@ -57,5 +57,9 @@ export default {
 }
 .nav-link:hover {
   color: white;
+}
+
+#logoutButton {
+  background-color: red;
 }
 </style>

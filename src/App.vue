@@ -7,7 +7,6 @@
 
 <script>
 import NavBar from './components/NavBar.vue'
-
 export default {
   name: 'App',
   components: {
@@ -17,5 +16,13 @@ export default {
 </script>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
+#app {
+  font-family: 'Anton', sans-serif;
+  font-size: 18px;
+}
 
+#app .blackButtons button {
+  background-color: black;
+}
 </style>
