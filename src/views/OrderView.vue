@@ -674,18 +674,14 @@ async setPesajeFinal() {
 },
 openModal(modalId, validateSelection = true) {
   if (validateSelection) {
-    const selectedOrders = this.sortedOrders.filter(
-      (order) => order.selected
-    );
-
-    if (selectedOrders.length !== 1) {
+    if (!this.selectedOrder) {
       toast.error("Se debe seleccionar 1 orden obligatoriamente", {
         timeout: 5000,
       });
       return;
     }
 
-    this.selectedOrder = selectedOrders[0];
+    
 
     // Validaciones del estado de la orden
     if (modalId === 'pesarCamionModal' && this.selectedOrder.estado !== 1) {
