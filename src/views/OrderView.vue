@@ -666,28 +666,45 @@ async setPesajeFinal() {
   }
   this.closeModal("nuevaOrdenModal");
 },
-    openModal(modalId, validateSelection = true) {
-      if (validateSelection) {
-        const selectedOrders = this.sortedOrders.filter(
-          (order) => order.selected
-        );
+openModal(modalId, validateSelection = true) {
+  if (validateSelection) {
+    const selectedOrders = this.sortedOrders.filter(
+      (order) => order.selected
+    );
 
-        if (selectedOrders.length !== 1) {
-          toast.error("Se debe seleccionar 1 orden obligatoriamente", {
-            timeout: 5000,
-          });
-          return;
-        }
-
-        this.selectedOrder = selectedOrders[0];
-      }
-      this.modalBackdropVisible = true;
-
-      this.$nextTick(() => {
-        const modal = document.getElementById(modalId);
-        modal.classList.add("show");
+    if (selectedOrders.length !== 1) {
+      toast.error("Se debe seleccionar 1 orden obligatoriamente", {
+        timeout: 5000,
       });
-    },
+      return;
+    }
+
+    this.selectedOrder = selectedOrders[0];
+
+    // Validaciones del estado de la orden
+    if (modalId === 'pesarCamionModal' && this.selectedOrder.estado !== 1) {
+      toast.error('No puede pesar el camión porque la orden está en estado ' + this.selectedOrder.estado);
+      return;
+    }
+
+    if ((modalId === 'agregarDetalleModal' || modalId === 'finalizarCargaModal') && this.selectedOrder.estado !== 2) {
+      toast.error('No puede realizar esta acción porque la orden está en estado ' + this.selectedOrder.estado);
+      return;
+    }
+
+    if (modalId === 'pesajeFinalModal' && this.selectedOrder.estado !== 3) {
+      toast.error('No puede realizar el pesaje final porque la orden está en estado ' + this.selectedOrder.estado);
+      return;
+    }
+  }
+
+  this.modalBackdropVisible = true;
+
+  this.$nextTick(() => {
+    const modal = document.getElementById(modalId);
+    modal.classList.add("show");
+  });
+},
 
     closeModal(modalId) {
       this.selectedOrder = null;
