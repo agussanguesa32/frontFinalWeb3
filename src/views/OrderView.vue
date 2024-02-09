@@ -4,7 +4,7 @@
     <div class="m-3">
       <div class="d-flex justify-content-between align-items-start mt-4">
         <div class="flex-grow-1 mr-3">
-    <table class="table">
+          <table class="table">
     <thead>
       <tr>
         <th></th>
@@ -29,9 +29,15 @@
       <tr
         v-for="(order, index) in sortedOrders"
         :key="index"
-        :class="{ 'selected-row': order.selected }"
+        :class="{ 'selected-row': selectedOrder === order }"
+        @click="selectedOrder = order"
       >
-        <td><input type="checkbox" v-model="order.selected" /></td>
+        <td>
+          <label class="custom-checkbox">
+            <input type="radio" :value="order" v-model="selectedOrder" name="orderSelection" class="hidden"/>
+            <span class="checkmark" :class="{ 'checked': selectedOrder === order }"></span>
+          </label>
+        </td>
         <td>{{ order.id }}</td>
         <td>
         {{ order.estado }}
@@ -830,7 +836,8 @@ openModal(modalId, validateSelection = true) {
 }
 
 .selected-row > td {
-  background-color: #9575cd;
+  background-color: black;
+  color: white;
 }
 
 .button-container {
@@ -867,6 +874,55 @@ openModal(modalId, validateSelection = true) {
 
 #closeButton {
   background-color: red;
+}
+
+.hidden {
+  display: none;
+}
+
+.custom-checkbox {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background-color: #eee;
+  border: 1px solid #ddd;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.custom-checkbox input:checked ~ .checkmark {
+  background-color: white;
+}
+
+.custom-checkbox input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.custom-checkbox .checkmark:after {
+  left: 9px;
+  top: 5px;
+  width: 5px;
+  height: 10px;
+  border: solid black;
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg);
+}
+.table tbody tr:hover td {
+  background-color: gray !important; /* Cambia esto al color gris que prefieras */
 }
 
 </style>

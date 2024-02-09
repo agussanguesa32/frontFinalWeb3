@@ -19,7 +19,7 @@ export default {
 @import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
 #app {
   font-family: 'Anton', sans-serif;
-  font-size: 18px;
+  font-size: 20px;
 }
 
 #app .blackButtons button {
