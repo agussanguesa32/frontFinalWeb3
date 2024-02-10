@@ -567,6 +567,7 @@ async setPesajeFinal() {
     });
     this.closeModal("pesajeFinalModal");
   } catch (error) {
+    toast.error("Hubo un error al establecer el pesaje final");
     console.error("Error al establecer el pesaje final:", error);
   }
 },
@@ -622,8 +623,11 @@ async setPesajeFinal() {
     console.error("Error al establecer el pesaje inicial:", error);
   }
 },
-    async sendOrder() {
-  const formattedDate = `${this.fechaSeleccionada.toISOString().split('T')[0]}T${String(this.selectedHour).padStart(2, '0')}:${String(this.selectedMinute).padStart(2, '0')}:00`;
+async sendOrder() {
+  let formattedDate = '';
+  if (this.fechaSeleccionada instanceof Date) {
+    formattedDate = `${this.fechaSeleccionada.toISOString().split('T')[0]}T${String(this.selectedHour).padStart(2, '0')}:${String(this.selectedMinute).padStart(2, '0')}:00`;
+  }
 
   const order = {
     camion: {
@@ -701,13 +705,44 @@ openModal(modalId, validateSelection = true) {
   });
 },
 
-    closeModal(modalId) {
-      this.selectedOrder = null;
-      this.pesoTexto = "";
-      const modal = document.getElementById(modalId);
-      modal.classList.remove("show");
-      this.modalBackdropVisible = false;
-    },
+closeModal(modalId) {
+  this.selectedOrder = null;
+  this.pesoTexto = "";
+
+  // Limpiar los campos dependiendo del modal
+  switch(modalId) {
+    case 'pesarCamionModal':
+      this.pesoTexto = '';
+      break;
+    case 'agregarDetalleModal':
+      this.detalle = {
+        masaAcumulada: '',
+        densidadProducto: '',
+        temperaturaProducto: '',
+        caudal: ''
+      };
+      break;
+    case 'pesajeFinalModal':
+      this.pesoTexto = '';
+      break;
+    case 'nuevaOrdenModal':
+      this.selectedDriver = '';
+      this.selectedClient = '';
+      this.selectedTruck = '';
+      this.selectedProduct = '';
+      this.fechaSeleccionada = '';
+      this.selectedHour = '';
+      this.selectedMinute = '';
+      this.preset = '';
+      break;
+    default:
+      break;
+  }
+
+  const modal = document.getElementById(modalId);
+  modal.classList.remove("show");
+  this.modalBackdropVisible = false;
+},
     toggleSort(key) {
       if (this.sortKey === key) {
         this.sortAsc = !this.sortAsc;

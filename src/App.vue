@@ -24,5 +24,6 @@ export default {
 
 #app .blackButtons button {
   background-color: black;
+  border: 0;
 }
 </style>

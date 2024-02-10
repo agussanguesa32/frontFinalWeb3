@@ -77,7 +77,7 @@ export default {
     };
     // Fetch orders in state 2 from the API
     axios
-  .get(`${process.env.VUE_APP_API_URL}/orders/findbyState?state=2`, {
+  .get(`${process.env.VUE_APP_API_URL}/orders/findByState?state=2`, {
     headers: {
       Authorization: `Bearer ${atob(Cookies.get("token"))}`,
     }

@@ -1,27 +1,31 @@
 <template>
   <nav class="navbar navbar-expand-lg custom-navbar">
     <div class="container-fluid">
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav mx-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="/ordenes">Ordenes</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/cargas-actuales">Cargas Actuales</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/conciliaciones">Conciliaciones</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/settings">Configuraciones</a>
-          </li>
-        </ul>
+      <div class="main-elements">
+        <div class="collapse navbar-collapse">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="/ordenes">Ordenes</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/cargas-actuales">Cargas Actuales</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/conciliaciones">Conciliaciones</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/settings">Configuraciones</a>
+            </li>
+          </ul>
+        </div>
       </div>
-      <a v-if="!isLoggedIn" class="nav-link" href="/login">
-        <i class="bi bi-person-fill fs-3"></i>
-      </a>
-      <span v-if="isLoggedIn && userRole" class="user-role" style="margin-right: 10px;">Tu rol es: {{ userRole }}</span>
-      <button v-if="isLoggedIn" class="btn btn-danger" @click="logout" id="logoutButton">Cerrar Sesion</button>
+      <div class="ml-auto">
+        <a v-if="!isLoggedIn" class="nav-link" href="/login">
+          <i class="bi bi-person-fill fs-3"></i>
+        </a>
+        <span v-if="isLoggedIn && userRole" class="user-role" style="margin-right: 10px;">Tu rol es: {{ userRole }}</span>
+        <button v-if="isLoggedIn" class="btn btn-danger" @click="logout" id="logoutButton">Cerrar Sesion</button>
+      </div>
     </div>
   </nav>
 </template>
@@ -65,14 +69,21 @@ export default {
   background-color: black;
   color: white;
 }
+
 .nav-link {
   color: white;
 }
+
 .nav-link:hover {
   color: white;
 }
 
 #logoutButton {
   background-color: red;
+}
+
+.main-elements {
+  display: flex;
+  align-items: center;
 }
 </style>

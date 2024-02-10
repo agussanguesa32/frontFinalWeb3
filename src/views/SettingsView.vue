@@ -1,83 +1,163 @@
 <template>
-    <div class="settings-view">
-        <div class="user-info">
-            <h1 class="username">{{ username }}</h1>
+    <div>
+      <h1 class="text-center">Bienvenido {{ username }}</h1>
+  
+      <div class="card-container blackButtons">
+        <div class="card">
+          <div class="card-body d-flex flex-column">
+            <p class="card-text">Aquí puedes modificar los emails destino.</p>
+            <button @click="showEmailModal = true" class="btn btn-primary mt-auto">Modificar Emails</button>
+          </div>
         </div>
-        <div class="options">
-            <div class="option-card">
-                <div class="card-content card">
-                    <h2>Email Personalizado</h2>
-                    <button @click="openEmailModal">Modificar</button>
-                </div>
-            </div>
-            <div class="option-card">
-                <div class="card-content card">
-                    <h2>Temperatura Umbral</h2>
-                    <button @click="openTemperatureModal">Modificar</button>
-                </div>
-            </div>
-        </div>
-        <div class="modals">
-            <!-- Email Modal -->
-            <div v-if="showEmailModal" class="modal">
-                <!-- Email modal content -->
-            </div>
-            <!-- Temperature Modal -->
-            <div v-if="showTemperatureModal" class="modal">
-                <!-- Temperature modal content -->
-            </div>
-        </div>
+  
+        <!-- Tarjeta para modificar temperatura umbral -->
+  <div class="card">
+    <div class="card-body d-flex flex-column">
+      <p class="card-text">La temperatura umbral actual es: {{ temperature }}°C</p>
+      <button @click="showTemperatureModal = true" class="btn btn-primary mt-auto">Modificar Temperatura</button>
     </div>
-</template>
+  </div>
+      </div>
+  
+      <!-- Modal para modificar emails destino -->
+    <div v-if="showEmailModal" class="modal blackButtons" id="emailModal" tabindex="-1" aria-labelledby="emailModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <!-- Cabecera del modal -->
+          <div class="modal-header">
+            <h5 class="modal-title" id="emailModalLabel">Modificar Emails destino</h5>
+            <button type="button" class="btn-close" @click="showEmailModal = false" style="background-color: red;"></button>
+          </div>
 
-<script>
+          <!-- Cuerpo del modal -->
+          <div class="modal-body text-center">
+            <p>Aquí puedes modificar los emails destino.</p>
+          </div>
+
+          <!-- Pie del modal -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary">Aceptar</button>
+            <button type="button" class="btn btn-secondary" @click="showEmailModal = false" style="background-color: red;">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+   <!-- Modal para modificar temperatura umbral -->
+  <div v-if="showTemperatureModal" class="modal blackButtons" id="temperatureModal" tabindex="-1" aria-labelledby="temperatureModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <!-- Cabecera del modal -->
+        <div class="modal-header">
+          <h5 class="modal-title" id="temperatureModalLabel">Modificar temperatura umbral</h5>
+          <button type="button" class="btn-close" @click="closeTemperatureModal" style="background-color: red;"></button>
+        </div>
+
+        <!-- Cuerpo del modal -->
+        <div class="modal-body text-center">
+          <p>La temperatura umbral actual es: {{ temperature }}°C</p>
+          <input type="number" v-model="newTemperature" placeholder="Ingrese la nueva temperatura umbral">
+        </div>
+
+        <!-- Pie del modal -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" @click="updateTemperature">Aceptar</button>
+          <button type="button" class="btn btn-secondary" @click="closeTemperatureModal" style="background-color: red;">Cancelar</button>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </template>
+  
+  <script>
+import axios from 'axios';
 import Cookies from 'js-cookie';
 
 export default {
-    data() {
-        return {
-            username: atob(Cookies.get('username')), 
-            showEmailModal: false,
-            showTemperatureModal: false
-        };
-    },
-    methods: {
-        openEmailModal() {
-            this.showEmailModal = true;
-        },
-        openTemperatureModal() {
-            this.showTemperatureModal = true;
+  data() {
+    return {
+      username: atob(Cookies.get('username')),
+      showEmailModal: false,
+      showTemperatureModal: false,
+      temperature: null,
+      newTemperature: null
+    };
+  },
+  async created() {
+    const token = atob(Cookies.get('token'));
+    const url = `${process.env.VUE_APP_API_URL}/configuration/getTemperaturaUmbral`;
+
+    try {
+      const response = await axios.get(url, {
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
+      });
+
+      this.temperature = response.data;
+    } catch (error) {
+      console.error(error);
     }
+  },
+  methods: {
+    async updateTemperature() {
+      const token = atob(Cookies.get('token'));
+      const url = `${process.env.VUE_APP_API_URL}/configuration/setTemperaturaUmbral?temperaturaUmbral=${this.newTemperature}`;
+
+      try {
+        await axios.post(url, {}, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        this.temperature = this.newTemperature;
+        this.closeTemperatureModal();
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    closeTemperatureModal() {
+      this.showTemperatureModal = false;
+      this.newTemperature = null;
+    }
+  }
 };
 </script>
-
-<style scoped>
-
-.user-info {
-    text-align: center;
-    margin-top: 20px;
-}
-
-.options {
+    
+  <style scoped>
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
-    margin-top: 20px;
-}
-.card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 20px;
-  background-color: #f5f5f5;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-  padding: 20px;
-  margin: 10px;
-}
-
-.card h2 {
-  color: #333;
-  margin-bottom: 20px;
-}
-</style>
+    align-items: center;
+    flex-direction: column;
+  }
+  
+  .card-container {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+  }
+  
+  .card {
+    width: 18rem;
+    margin: 1rem;
+  }
+  
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .btn {
+    margin-top: auto;
+  }
+  </style>

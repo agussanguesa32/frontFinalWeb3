@@ -12,7 +12,6 @@ const routes = [
   { path: '/conciliaciones', component: ConciliationsView },
   { path: '/login', component: LoginView },
   { path: '/settings', component: SettingsView },
-
 ];
 
 const router = createRouter({
@@ -27,6 +26,8 @@ router.beforeEach((to, from, next) => {
     next('/ordenes');
   } else if (!token && to.path !== '/login') {
     next('/login');
+  } else if (to.matched.length === 0 && token) {
+    next('/ordenes');
   } else {
     next();
   }
