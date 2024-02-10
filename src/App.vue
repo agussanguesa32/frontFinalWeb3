@@ -26,4 +26,7 @@ export default {
   background-color: black;
   border: 0;
 }
+body {
+  padding-top: 60px;
+}
 </style>

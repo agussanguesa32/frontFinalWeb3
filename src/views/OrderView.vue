@@ -423,7 +423,8 @@ import "vue3-toastify/dist/index.css";
 import Datepicker from "vue3-datepicker";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 export default {
   components: {
@@ -596,7 +597,7 @@ async setPesajeFinal() {
       }
     },
     formatDate(date) {
-      return format(new Date(date), 'yyyy-MM-dd HH:mm');
+      return format(parseISO(date), "d 'de' MMMM yyyy, HH:mm'HS'", { locale: es });
     },
     async setPesajeInicial() {
   try {

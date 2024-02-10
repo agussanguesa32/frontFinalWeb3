@@ -1,6 +1,6 @@
 <template>
     <div>
-      <h1 class="text-center">Bienvenido {{ username }}</h1>
+      <h1 class="text-center title">Bienvenido {{ username }}</h1>
   
       <div class="card-container blackButtons">
         <div class="card">
@@ -73,6 +73,7 @@
   <script>
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { toast } from "vue3-toastify";
 
 export default {
   data() {
@@ -113,9 +114,11 @@ export default {
         });
 
         this.temperature = this.newTemperature;
+        toast.success('Temperatura umbral actualizada correctamente a ' + this.newTemperature + '°C.');
         this.closeTemperatureModal();
       } catch (error) {
         console.error(error);
+        toast.error('Ha ocurrido un error al actualizar la temperatura umbral.');
       }
     },
     closeTemperatureModal() {
@@ -159,5 +162,9 @@ export default {
   
   .btn {
     margin-top: auto;
+  }
+
+  .title{
+    margin-top: 10px;
   }
   </style>
