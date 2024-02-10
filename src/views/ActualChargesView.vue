@@ -39,6 +39,8 @@
 
 <script>
 import axios from "axios";
+import Cookies from "js-cookie";
+
 export default {
   name: "ActualChargesView",
   data() {
