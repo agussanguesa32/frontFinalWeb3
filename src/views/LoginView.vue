@@ -34,7 +34,7 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { toast } from 'vue3-toastify';
-import { mapMutations } from 'vuex';
+import { mapMutations, mapActions } from 'vuex';
 
 export default {
   data() {
@@ -44,30 +44,33 @@ export default {
     };
   },
   methods: {
-    ...mapMutations([
-      'login'
-    ]),
-    async submitLogin() {
-      try {
-        const response = await axios.post(`${process.env.VUE_APP_API_URL}/login?username=${this.username}&password=${this.password}`);
+  ...mapMutations([
+    'login'
+  ]),
+  ...mapActions([
+    'fetchUserRole'
+  ]),
+  async submitLogin() {
+  try {
+    const response = await axios.post(`${process.env.VUE_APP_API_URL}/login?username=${this.username}&password=${this.password}`);
 
-        if (response.data && typeof response.data !== 'undefined') {
-          Cookies.set('token', response.data);
-          this.login(response.data);
-          toast.success('Ha iniciado sesion correctamente');
-          setTimeout(() => {
-            this.$router.push('/ordenes');
-          }, 1000);
-          console.log('Token guardado:', Cookies.get('token'));
-        } else {
-          console.log('No se recibió ningún token');
-          toast.error('Hubo un error interno. Por favor, inténtalo de nuevo más tarde.');
-        }
-      } catch (error) {
-        console.error('Error al hacer login:', error);
-        toast.error('Los datos de inicio de sesión no son válidos');
-      }
+    if (response.data && typeof response.data !== 'undefined') {
+      console.log(response.data);
+      Cookies.set('token', response.data); 
+      Cookies.set('username', this.username); 
+      this.login({ token: response.data, username: this.username }); 
+      await this.fetchUserRole();
+      toast.success('Ha iniciado sesion correctamente');
+      setTimeout(() => {
+        this.$router.push('/ordenes');
+      }, 1000);
+    } else {
+      toast.error('Hubo un error interno. Por favor, inténtalo de nuevo más tarde.');
     }
+  } catch (error) {
+    toast.error('Los datos de inicio de sesión no son válidos');
+  }
+}
   }
 };
 </script>
@@ -78,7 +81,6 @@ export default {
   height: 120px;
   margin: 0 auto 15px; 
 }
-
 .logo {
   width: 100px;
   height: 100px;

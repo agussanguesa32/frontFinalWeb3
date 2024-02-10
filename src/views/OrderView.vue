@@ -499,7 +499,7 @@ export default {
           `${process.env.VUE_APP_API_URL}/alarm/list`,
           {
             headers: {
-              Authorization: `Bearer ${Cookies.get("token")}`,
+              Authorization: `Bearer ${atob(Cookies.get("token"))}`,
             },
           }
         );
@@ -530,7 +530,7 @@ export default {
       },
       {
         headers: {
-          Authorization: `Bearer ${Cookies.get("token")}`,
+          Authorization: `Bearer ${atob(Cookies.get("token"))}`,
         },
       }
     );
@@ -556,7 +556,7 @@ async setPesajeFinal() {
           pesajeFinal,
         },
         headers: {
-          Authorization: `Bearer ${Cookies.get("token")}`,
+          Authorization: `Bearer ${atob(Cookies.get("token"))}`,
         },
       }
     );
@@ -580,7 +580,7 @@ async setPesajeFinal() {
               id: this.selectedOrder.id,
             },
             headers: {
-              Authorization: `Bearer ${Cookies.get("token")}`,
+              Authorization: `Bearer ${atob(Cookies.get("token"))}`,
             },
           }
         );
@@ -608,7 +608,7 @@ async setPesajeFinal() {
           pesajeInicial: this.pesoTexto,
         },
         headers: {
-          Authorization: `Bearer ${Cookies.get("token")}`,
+          Authorization: `Bearer ${atob(Cookies.get("token"))}`,
         },
       }
     );
@@ -650,7 +650,7 @@ async setPesajeFinal() {
       order,
       {
         headers: {
-          Authorization: `Bearer ${Cookies.get("token")}`,
+          Authorization: `Bearer ${atob(Cookies.get("token"))}`,
         },
       }
     );
@@ -722,7 +722,7 @@ openModal(modalId, validateSelection = true) {
           `${process.env.VUE_APP_API_URL}/orders/list`,
           {
             headers: {
-              Authorization: `Bearer ${Cookies.get("token")}`,
+              Authorization: `Bearer ${atob(Cookies.get("token"))}`,
             },
           }
         );
@@ -740,7 +740,7 @@ openModal(modalId, validateSelection = true) {
           `${process.env.VUE_APP_API_URL}/drivers/list`,
           {
             headers: {
-              Authorization: `Bearer ${Cookies.get("token")}`,
+              Authorization: `Bearer ${atob(Cookies.get("token"))}`,
             },
           }
         );
@@ -757,7 +757,7 @@ openModal(modalId, validateSelection = true) {
           `${process.env.VUE_APP_API_URL}/clients/list`,
           {
             headers: {
-              Authorization: `Bearer ${Cookies.get("token")}`,
+              Authorization: `Bearer ${atob(Cookies.get("token"))}`,
             },
           }
         );
@@ -774,7 +774,7 @@ openModal(modalId, validateSelection = true) {
           `${process.env.VUE_APP_API_URL}/trucks/list`,
           {
             headers: {
-              Authorization: `Bearer ${Cookies.get("token")}`,
+              Authorization: `Bearer ${atob(Cookies.get("token"))}`,
             },
           }
         );
@@ -791,7 +791,7 @@ openModal(modalId, validateSelection = true) {
           `${process.env.VUE_APP_API_URL}/products/list`,
           {
             headers: {
-              Authorization: `Bearer ${Cookies.get("token")}`,
+              Authorization: `Bearer ${atob(Cookies.get("token"))}`,
             },
           }
         );
