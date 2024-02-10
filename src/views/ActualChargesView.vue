@@ -38,6 +38,7 @@
 </template>
 
 <script>
+import axios from "axios";
 export default {
   name: "ActualChargesView",
   data() {
@@ -72,6 +73,15 @@ export default {
         this.orders.push(message);
       }
     };
+    // Fetch orders in state 2 from the API
+    axios
+      .get(`${process.env.VUE_APP_API_URL}/orders/findbyState?state=2`)
+      .then((response) => {
+        this.orders = response.data;
+      })
+      .catch((error) => {
+        console.error("Error fetching orders:", error);
+      });
   },
 
   beforeUnmount() {
