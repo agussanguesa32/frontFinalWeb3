@@ -10,15 +10,15 @@
           >
             <div class="card mb-3">
               <div class="card-header d-flex justify-content-center">
-                <h5>Orden {{ order.orden }}</h5>
+                <h5>Orden {{ order.id }}</h5>
               </div>
               <div class="card-body">
-                <p>Temperatura: {{ order.temperatura }}</p>
+                <p>Temperatura: {{ order.temperaturaProducto }}</p>
                 <p>Tiempo transcurrido: {{ order.tiempoTranscurrido }}</p>
                 <p>Preset: {{ order.preset }}</p>
                 <p>Masa acumulada: {{ order.masaAcumulada }}</p>
                 <p>
-                  Tiempo estimado restante: {{ order.tiempoEstimadoRestante }}
+                  Tiempo estimado restante: {{ order.tiempoRestanteEstimado }}
                 </p>
                 <div class="d-flex justify-content-center">
                   <button
@@ -49,28 +49,31 @@ export default {
   },
 
   mounted() {
-
     // Create and connect the WebSocket
-    this.socket = new WebSocket("ws://localhost:9080/chat");
-    
-    this.socket.onopen = (event) => {
-      console.log(event);
+    this.socket = new WebSocket(`${process.env.VUE_APP_API_WS_URL}/chat`);
+
+    this.socket.onopen = () => {
       console.log("WebSocket connection established");
     };
 
     this.socket.onmessage = (event) => {
-      console.log(event);
-      console.log("WebSocket message received");
-    };
-    /*
-    this.socket.onmessage = (event) => {
       // Parse the message received from the server
       const message = JSON.parse(event.data);
-      // Update the orders array with the new data
-      this.orders.push(message);
+      // Check if the order already exists in the orders array
+      const existingOrderIndex = this.orders.findIndex(
+        (order) => order.id === message.orden
+      );
+      // If the order exists, update it; otherwise, push it to the orders array
+      if (existingOrderIndex !== -1) {
+        // Update existing order
+        this.orders.splice(existingOrderIndex, 1, message);
+      } else {
+        // Add new order to the orders array
+        this.orders.push(message);
+      }
     };
-    */
   },
+
   beforeUnmount() {
     // Clean up the WebSocket connection when the component is destroyed
     this.socket.close();
