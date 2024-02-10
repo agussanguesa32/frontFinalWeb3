@@ -32,6 +32,9 @@
             </tr>
           </tbody>
         </table>
+        <div class="d-flex justify-content-center blackButtons">
+          <button @click="downloadPDF" class="btn btn-primary mb-2">Exportar PDF</button>
+        </div>
       </div>
     </div>
   </div>
@@ -42,6 +45,8 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
 
 export default {
   data() {
@@ -57,6 +62,26 @@ export default {
     },
   },
   methods: {
+    downloadPDF() {
+      const doc = new jsPDF();
+      const headers = ['Id', 'Fecha', 'Pesaje Inicial', 'Pesaje Final', 'Producto Cargado', 'Caudal Promedio', 'Densidad Promedio', 'Temperatura Promedio'];
+      const data = this.conciliations.map(conciliation => [
+        conciliation.id,
+        this.formatDate(conciliation.fecha),
+        conciliation.pesajeInicial,
+        conciliation.pesajeFinal,
+        conciliation.productoCargado,
+        conciliation.promedioCaudal,
+        conciliation.promedioDensidad,
+        conciliation.promedioTemperatura
+      ]);
+      doc.autoTable({
+        head: [headers],
+        body: data,
+      });
+      doc.save('conciliations.pdf');
+    },
+
     formatDate(date) {
       return format(parseISO(date), "d 'de' MMMM yyyy, HH:mm'HS'", { locale: es });
     },
@@ -69,20 +94,20 @@ export default {
       }
     },
     async fetchConciliations() {
-  try {
-    const response = await axios.get(
-      `${process.env.VUE_APP_API_URL}/conciliations/list`,
-      {
-        headers: {
-          Authorization: `Bearer ${atob(Cookies.get("token"))}`,
-        },
+      try {
+        const response = await axios.get(
+          `${process.env.VUE_APP_API_URL}/conciliations/list`,
+          {
+            headers: {
+              Authorization: `Bearer ${atob(Cookies.get("token"))}`,
+            },
+          }
+        );
+        this.conciliations = response.data;
+      } catch (error) {
+        console.error("Error al obtener las conciliaciones:", error);
       }
-    );
-    this.conciliations = response.data;
-  } catch (error) {
-    console.error("Error al obtener las conciliaciones:", error);
-  }
-},
+    },
   },
   created() {
     this.fetchConciliations();
