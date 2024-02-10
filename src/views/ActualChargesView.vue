@@ -75,13 +75,17 @@ export default {
     };
     // Fetch orders in state 2 from the API
     axios
-      .get(`${process.env.VUE_APP_API_URL}/orders/findbyState?state=2`)
-      .then((response) => {
-        this.orders = response.data;
-      })
-      .catch((error) => {
-        console.error("Error fetching orders:", error);
-      });
+  .get(`${process.env.VUE_APP_API_URL}/orders/findbyState?state=2`, {
+    headers: {
+      Authorization: `Bearer ${atob(Cookies.get("token"))}`,
+    }
+  })
+  .then((response) => {
+    this.orders = response.data;
+  })
+  .catch((error) => {
+    console.error("Error fetching orders:", error);
+  });
   },
 
   beforeUnmount() {
