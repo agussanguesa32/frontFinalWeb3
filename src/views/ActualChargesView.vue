@@ -20,13 +20,62 @@
                 <p>
                   Tiempo estimado restante: {{ order.tiempoRestanteEstimado }}
                 </p>
-                <div class="d-flex justify-content-center">
+                <div class="d-flex justify-content-center blackButtons">
                   <button
-                    @click="finalizarCarga(order)"
-                    class="btn btn-primary mt-2"
+                    class="btn custom-button mb-2"
+                    @click="openModal(order)"
                   >
                     Finalizar Carga
                   </button>
+                </div>
+              </div>
+              <!-- Modal para finalizar carga -->
+              <div
+                class="modal blackButtons"
+                v-bind:id="'finalizarCargaModal' + order.id"
+                tabindex="-1"
+                aria-labelledby="finalizarCargaModalLabel"
+                aria-hidden="true"
+              >
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <!-- Cabecera del modal -->
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="finalizarCargaModalLabel">
+                        Finalizar Carga
+                      </h5>
+                      <button
+                        type="button"
+                        class="btn-close"
+                        @click="closeModal(order.id)"
+                        style="background-color: red"
+                      ></button>
+                    </div>
+
+                    <!-- Cuerpo del modal -->
+                    <div class="modal-body text-center">
+                      <p>Se cargaron {{ order.masaAcumulada }} Kg</p>
+                    </div>
+
+                    <!-- Pie del modal -->
+                    <div class="modal-footer">
+                      <button
+                        type="button"
+                        class="btn btn-primary"
+                        @click="finalizarCarga(order)"
+                      >
+                        Aceptar
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-secondary"
+                        @click="closeModal(order.id)"
+                        style="background-color: red"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -41,14 +90,14 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 import { toast } from "vue3-toastify";
-
+import "vue3-toastify/dist/index.css";
 export default {
   name: "ActualChargesView",
   data() {
     return {
       orders: [],
       socket: null,
-      token: null,
+      modalBackdropVisible: false,
     };
   },
 
@@ -85,7 +134,7 @@ export default {
         this.obtainOrders().then((data) => {
           this.orders = data;
         });
-        this.closeModal("finalizarCargaModal");
+        this.closeModal(order.id);
       } catch (error) {
         console.error("Error al finalizar la carga:", error);
       }
@@ -136,51 +185,90 @@ export default {
         console.error("Error fetching orders:", error);
       }
     },
-    closeModal(modalId) {
-  this.selectedOrder = null;
-  this.pesoTexto = "";
 
-  // Limpiar los campos dependiendo del modal
-  switch(modalId) {
-    case 'pesarCamionModal':
-      this.pesoTexto = '';
-      break;
-    case 'agregarDetalleModal':
-      this.detalle = {
-        masaAcumulada: '',
-        densidadProducto: '',
-        temperaturaProducto: '',
-        caudal: ''
-      };
-      break;
-    case 'pesajeFinalModal':
-      this.pesoTexto = '';
-      break;
-    case 'nuevaOrdenModal':
-      this.selectedDriver = '';
-      this.selectedClient = '';
-      this.selectedTruck = '';
-      this.selectedProduct = '';
-      this.fechaSeleccionada = '';
-      this.selectedHour = '';
-      this.selectedMinute = '';
-      this.preset = '';
-      break;
-    default:
-      break;
-  }
+    openModal(order) {
+      // Validacion de orden con detalle
+      if (order.temperaturaProducto === null) {
+        toast.error("La orden aun no ha emitido ningun detalle");
+        return;
+      }
 
-  const modal = document.getElementById(modalId);
-  modal.classList.remove("show");
-  this.modalBackdropVisible = false;
-},
+      this.modalBackdropVisible = true;
+
+      this.$nextTick(() => {
+        const modal = document.getElementById("finalizarCargaModal" + order.id);
+        modal.classList.add("show");
+      });
+    },
+
+    closeModal(orderId) {
+      const modal = document.getElementById("finalizarCargaModal" + orderId);
+      modal.classList.remove("show");
+      this.modalBackdropVisible = false;
+    },
   },
 };
 </script>
 
 <style scoped>
+
+.custom-button {
+  background-color: #6f42c1;
+  color: white;
+}
+
+.custom-button:hover,
+.custom-button:focus:active {
+  background-color: #9575cd;
+}
+
+.fixed-bottom-center {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
 .card {
   width: 100%;
   min-height: 100px;
 }
+.button-container {
+  margin-left: 20px;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1050;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  outline: 0;
+}
+
+.modal.show {
+  display: block;
+}
+
+.modal-backdrop {
+  z-index: 1040;
+  background-color: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#nuevaOrdenModal {
+  top: -20px;
+}
+
+#closeButton {
+  background-color: red;
+}
+
 </style>
