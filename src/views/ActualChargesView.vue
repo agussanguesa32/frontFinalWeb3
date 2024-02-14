@@ -78,6 +78,7 @@
                   </div>
                 </div>
               </div>
+              <div v-if="modalBackdropVisible" class="modal-backdrop"></div>
             </div>
           </div>
         </div>
