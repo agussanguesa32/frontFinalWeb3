@@ -1,50 +1,179 @@
 <template>
   <div>
     <CarouselComponent />
+    <!-- Botón de filtro -->
+    <div class="blackButtons d-flex justify-content-center">
+      <button class="btn custom-button m-2" @click="openFilterModal">
+        Filtrar
+      </button>
+
+      <!-- Ventana modal de filtro -->
+      <div
+        ref="filterModal"
+        class="modal blackButtons"
+        tabindex="-1"
+        aria-labelledby="filterModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <!-- Cabecera de la ventana modal -->
+            <div class="modal-header">
+              <h5 class="modal-title">Filtrar órdenes</h5>
+              <button
+                type="button"
+                class="btn-close"
+                @click="closeFilterModal"
+                style="background-color: red"
+              ></button>
+            </div>
+
+            <!-- Cuerpo de la ventana modal -->
+            <div class="modal-body">
+              <!-- Filtros por fecha -->
+              <div class="form-group">
+                <label for="fechaInicioInput">Fecha de recepción desde:</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="fechaInicioInput"
+                  v-model="fechaInicioFiltro"
+                />
+              </div>
+              <div class="form-group">
+                <label for="fechaFinInput">Fecha de recepción hasta:</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="fechaFinInput"
+                  v-model="fechaFinFiltro"
+                />
+              </div>
+
+              <!-- Filtros por estado -->
+              <div class="form-group">
+                <label>Estados de las órdenes:</label>
+                <div class="checkboxes-inline">
+                  <div class="form-check">
+                    <input
+                      type="checkbox"
+                      class="form-check-input"
+                      id="estado1Checkbox"
+                      v-model="estado1Filtro"
+                    />
+                    <label class="form-check-label" for="estado1Checkbox"
+                      >1</label
+                    >
+                  </div>
+                  <div class="form-check">
+                    <input
+                      type="checkbox"
+                      class="form-check-input"
+                      id="estado2Checkbox"
+                      v-model="estado2Filtro"
+                    />
+                    <label class="form-check-label" for="estado2Checkbox"
+                      >2</label
+                    >
+                  </div>
+                  <div class="form-check">
+                    <input
+                      type="checkbox"
+                      class="form-check-input"
+                      id="estado3Checkbox"
+                      v-model="estado3Filtro"
+                    />
+                    <label class="form-check-label" for="estado3Checkbox"
+                      >3</label
+                    >
+                  </div>
+                  <div class="form-check">
+                    <input
+                      type="checkbox"
+                      class="form-check-input"
+                      id="estado4Checkbox"
+                      v-model="estado4Filtro"
+                    />
+                    <label class="form-check-label" for="estado4Checkbox"
+                      >4</label
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pie de la ventana modal -->
+            <div class="modal-footer">
+              <!-- Botón para aplicar los filtros -->
+              <button
+                type="button"
+                class="btn btn-primary"
+                @click="applyFilters"
+              >
+                Aplicar filtros
+              </button>
+              <!-- Botón para cerrar la ventana modal -->
+              <button
+                type="button"
+                class="btn btn-secondary"
+                @click="closeFilterModal"
+                style="background-color: red"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+          <div v-if="modalBackdropVisible" class="modal-backdrop"></div>
+        </div>
+      </div>
+    </div>
     <div class="m-3">
       <div class="d-flex justify-content-between align-items-start mt-4">
         <div class="flex-grow-1 mr-3">
           <table class="table">
-    <thead>
-      <tr>
-        <th @click="toggleSort('orden')">
-          Orden
-          <span v-if="sortKey === 'orden' && sortAsc">↑</span>
-          <span v-else-if="sortKey === 'orden' && !sortAsc">↓</span>
-        </th>
-        <th @click="toggleSort('estado')">
-          Estado
-          <span v-if="sortKey === 'estado' && sortAsc">↑</span>
-          <span v-else-if="sortKey === 'estado' && !sortAsc">↓</span>
-        </th>
-        <th>Camión</th>
-        <th>Preset</th>
-        <th>Chofer</th>
-        <th>Producto</th>
-        <th>Fecha y Hora Prevista</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr
-        v-for="(order, index) in sortedOrders"
-        :key="index"
-        :class="{ 'selected-row': selectedOrder === order }"
-        @click="selectedOrder = order"
-      >
-        <td>{{ order.id }}</td>
-        <td>
-        {{ order.estado }}
-        <i class="fas fa-exclamation-triangle" v-if="isOrderInAlerts(order.id)" style="color: red;"></i>
-        </td>
-        <td>{{ order.camion.patente }}</td>
-        <td>{{ order.preset }}</td>
-        <td>{{ order.chofer.apellido }}</td>
-        <td>{{ order.producto.nombre }}</td>
-        <td>{{ formatDate(order.fechaCargaPrevista) }}</td> 
-      </tr>
-    </tbody>
-  </table>
-
+            <thead>
+              <tr>
+                <th @click="toggleSort('orden')">
+                  Orden
+                  <span v-if="sortKey === 'orden' && sortAsc">↑</span>
+                  <span v-else-if="sortKey === 'orden' && !sortAsc">↓</span>
+                </th>
+                <th @click="toggleSort('estado')">
+                  Estado
+                  <span v-if="sortKey === 'estado' && sortAsc">↑</span>
+                  <span v-else-if="sortKey === 'estado' && !sortAsc">↓</span>
+                </th>
+                <th>Camión</th>
+                <th>Preset</th>
+                <th>Chofer</th>
+                <th>Producto</th>
+                <th>Fecha y Hora Prevista</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(order, index) in sortedOrders"
+                :key="index"
+                :class="{ 'selected-row': selectedOrder === order }"
+                @click="selectedOrder = order"
+              >
+                <td>{{ order.id }}</td>
+                <td>
+                  {{ order.estado }}
+                  <i
+                    class="fas fa-exclamation-triangle"
+                    v-if="isOrderInAlerts(order.id)"
+                    style="color: red"
+                  ></i>
+                </td>
+                <td>{{ order.camion.patente }}</td>
+                <td>{{ order.preset }}</td>
+                <td>{{ order.chofer.apellido }}</td>
+                <td>{{ order.producto.nombre }}</td>
+                <td>{{ formatDate(order.fechaCargaPrevista) }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <!-- Botones -->
         <div
@@ -56,7 +185,11 @@
           >
             Pesar Camion
           </button>
-          <button type="button" class="btn custom-button mb-2" @click="openModal('agregarDetalleModal')">
+          <button
+            type="button"
+            class="btn custom-button mb-2"
+            @click="openModal('agregarDetalleModal')"
+          >
             Agregar detalle
           </button>
           <button
@@ -65,7 +198,7 @@
           >
             Finalizar Carga
           </button>
-          
+
           <button
             class="btn custom-button mb-2"
             @click="openModal('pesajeFinalModal')"
@@ -83,73 +216,76 @@
     </div>
     <div class="blackButtons">
       <button
-      class="btn custom-button mb-2 fixed-bottom-center"
-      @click="openModal('nuevaOrdenModal', false)"
-    >
-      Nueva Orden
-    </button>
+        class="btn custom-button mb-2 fixed-bottom-center"
+        @click="openModal('nuevaOrdenModal', false)"
+      >
+        Nueva Orden
+      </button>
     </div>
-    
 
-   <!-- Modal para pesar el camión -->
-<div
-  v-if="selectedOrder"
-  class="modal blackButtons"
-  id="pesarCamionModal"
-  tabindex="-1"
-  aria-labelledby="pesarCamionModalLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Pesar Camión</h5>
-        <button
-          type="button"
-          class="btn-close"
-          @click="closeModal('pesarCamionModal')"
-          style="background-color: red;"
-        ></button>
-      </div>
-      <div class="modal-body">
-        <h6>Orden: {{ selectedOrder.id }}</h6> 
-        <h6>Camión: {{ selectedOrder.camion.patente }}</h6>
-        <div class="form-group">
-          <label for="pesoInput">Peso:</label>
-          <input
-            type="number"
-            class="form-control"
-            id="pesoInput"
-            v-model="pesoTexto"
-            placeholder="Ingrese el peso..."
-          />
+    <!-- Modal para pesar el camión -->
+    <div
+      v-if="selectedOrder"
+      class="modal blackButtons"
+      id="pesarCamionModal"
+      tabindex="-1"
+      aria-labelledby="pesarCamionModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Pesar Camión</h5>
+            <button
+              type="button"
+              class="btn-close"
+              @click="closeModal('pesarCamionModal')"
+              style="background-color: red"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <h6>Orden: {{ selectedOrder.id }}</h6>
+            <h6>Camión: {{ selectedOrder.camion.patente }}</h6>
+            <div class="form-group">
+              <label for="pesoInput">Peso:</label>
+              <input
+                type="number"
+                class="form-control"
+                id="pesoInput"
+                v-model="pesoTexto"
+                placeholder="Ingrese el peso..."
+              />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="setPesajeInicial"
+            >
+              Aceptar
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              @click="closeModal('pesarCamionModal')"
+              style="background-color: red"
+            >
+              Cancelar
+            </button>
+          </div>
         </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-primary" @click="setPesajeInicial">
-    Aceptar
-  </button>
-        <button
-          type="button"
-          class="btn btn-secondary"
-          @click="closeModal('pesarCamionModal')"
-          style="background-color: red;"
-        >
-          Cancelar
-        </button>
-      </div>
     </div>
-  </div>
-</div>
 
     <!-- Modal para finalizar carga -->
     <div
-    v-if="selectedOrder"
-    class="modal blackButtons"
-    id="finalizarCargaModal"
-    tabindex="-1"
-    aria-labelledby="finalizarCargaModalLabel"
-    aria-hidden="true"
+      v-if="selectedOrder"
+      class="modal blackButtons"
+      id="finalizarCargaModal"
+      tabindex="-1"
+      aria-labelledby="finalizarCargaModalLabel"
+      aria-hidden="true"
     >
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -162,7 +298,7 @@
               type="button"
               class="btn-close"
               @click="closeModal('pesarCamionModal')"
-              style="background-color: red;"
+              style="background-color: red"
             ></button>
           </div>
 
@@ -171,130 +307,170 @@
             <p>Se cargaron {{ selectedOrder.pesajeInicial }} Kg</p>
           </div>
 
-         <!-- Pie del modal -->
-    <div class="modal-footer">
-      <button type="button" class="btn btn-primary" @click="finalizarCarga">
-        Aceptar
-      </button>
-      <button
-        type="button"
-        class="btn btn-secondary"
-        @click="closeModal('finalizarCargaModal')"
-        style="background-color: red;"
-      >
-        Cancelar
-      </button>
-    </div>
-  </div>
-      </div>
-    </div>
-<!-- Modal para agregar detalle -->
-<div
-    class="modal blackButtons"
-    id="agregarDetalleModal"
-    tabindex="-1"
-    aria-labelledby="agregarDetalleModalLabel"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="agregarDetalleModalLabel">
-            Agregar Detalle
-          </h5>
-          <button
-            type="button"
-            class="btn-close"
-            @click="closeModal('agregarDetalleModal')"
-            style="background-color: red;"
-          ></button>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="masaAcumuladaInput">Masa acumulada:</label>
-            <input type="number" class="form-control" id="masaAcumuladaInput" v-model="detalle.masaAcumulada" placeholder="Ingrese la masa acumulada...">
+          <!-- Pie del modal -->
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="finalizarCarga"
+            >
+              Aceptar
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              @click="closeModal('finalizarCargaModal')"
+              style="background-color: red"
+            >
+              Cancelar
+            </button>
           </div>
-          <div class="form-group">
-            <label for="densidadProductoInput">Densidad del producto:</label>
-            <input type="number" class="form-control" id="densidadProductoInput" v-model="detalle.densidadProducto" placeholder="Ingrese la densidad del producto...">
-          </div>
-          <div class="form-group">
-            <label for="temperaturaProductoInput">Temperatura del producto:</label>
-            <input type="number" class="form-control" id="temperaturaProductoInput" v-model="detalle.temperaturaProducto" placeholder="Ingrese la temperatura del producto...">
-          </div>
-          <div class="form-group">
-            <label for="caudalInput">Caudal:</label>
-            <input type="number" class="form-control" id="caudalInput" v-model="detalle.caudal" placeholder="Ingrese el caudal...">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" @click="agregarDetalle">
-            Aceptar
-          </button>
-          <button
-            type="button"
-            class="btn btn-secondary"
-            @click="closeModal('agregarDetalleModal')"
-            style="background-color: red;"
-          >
-            Cancelar
-          </button>
         </div>
       </div>
     </div>
-  </div>
+    <!-- Modal para agregar detalle -->
+    <div
+      class="modal blackButtons"
+      id="agregarDetalleModal"
+      tabindex="-1"
+      aria-labelledby="agregarDetalleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="agregarDetalleModalLabel">
+              Agregar Detalle
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              @click="closeModal('agregarDetalleModal')"
+              style="background-color: red"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="masaAcumuladaInput">Masa acumulada:</label>
+              <input
+                type="number"
+                class="form-control"
+                id="masaAcumuladaInput"
+                v-model="detalle.masaAcumulada"
+                placeholder="Ingrese la masa acumulada..."
+              />
+            </div>
+            <div class="form-group">
+              <label for="densidadProductoInput">Densidad del producto:</label>
+              <input
+                type="number"
+                class="form-control"
+                id="densidadProductoInput"
+                v-model="detalle.densidadProducto"
+                placeholder="Ingrese la densidad del producto..."
+              />
+            </div>
+            <div class="form-group">
+              <label for="temperaturaProductoInput"
+                >Temperatura del producto:</label
+              >
+              <input
+                type="number"
+                class="form-control"
+                id="temperaturaProductoInput"
+                v-model="detalle.temperaturaProducto"
+                placeholder="Ingrese la temperatura del producto..."
+              />
+            </div>
+            <div class="form-group">
+              <label for="caudalInput">Caudal:</label>
+              <input
+                type="number"
+                class="form-control"
+                id="caudalInput"
+                v-model="detalle.caudal"
+                placeholder="Ingrese el caudal..."
+              />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="agregarDetalle"
+            >
+              Aceptar
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              @click="closeModal('agregarDetalleModal')"
+              style="background-color: red"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- Modal para pesaje final -->
-<div
-  v-if="selectedOrder"
-  class="modal blackButtons"
-  id="pesajeFinalModal"
-  tabindex="-1"
-  aria-labelledby="pesajeFinalModalLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Pesaje Final</h5>
-        <button
-          type="button"
-          class="btn-close"
-          @click="closeModal('pesajeFinalModal')"
-          style="background-color: red;"
-        ></button>
-      </div>
-      <div class="modal-body">
-        <h6>Orden: {{ selectedOrder.id }}</h6> <!-- Access the id property directly -->
-        <h6>Camión: {{ selectedOrder.camion.patente }}</h6> <!-- Access the patente property of the camion -->
-        <div class="form-group">
-          <label for="pesoInput">Peso:</label>
-          <input
-            type="text"
-            class="form-control"
-            id="pesoInput"
-            v-model="pesoTexto"
-            placeholder="Ingrese el peso..."
-          />
-        </div>
-      </div>
+    <div
+      v-if="selectedOrder"
+      class="modal blackButtons"
+      id="pesajeFinalModal"
+      tabindex="-1"
+      aria-labelledby="pesajeFinalModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Pesaje Final</h5>
+            <button
+              type="button"
+              class="btn-close"
+              @click="closeModal('pesajeFinalModal')"
+              style="background-color: red"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <h6>Orden: {{ selectedOrder.id }}</h6>
+            <!-- Access the id property directly -->
+            <h6>Camión: {{ selectedOrder.camion.patente }}</h6>
+            <!-- Access the patente property of the camion -->
+            <div class="form-group">
+              <label for="pesoInput">Peso:</label>
+              <input
+                type="text"
+                class="form-control"
+                id="pesoInput"
+                v-model="pesoTexto"
+                placeholder="Ingrese el peso..."
+              />
+            </div>
+          </div>
           <!-- Pie del modal -->
 
-      <div class="modal-footer">
-      <button type="button" class="btn btn-primary" @click="setPesajeFinal">
-        Aceptar
-      </button>
-      <button
-        type="button"
-        class="btn btn-secondary"
-        @click="closeModal('pesajeFinalModal')"
-        style="background-color: red;"
-      >
-        Cancelar
-      </button>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="setPesajeFinal"
+            >
+              Aceptar
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              @click="closeModal('pesajeFinalModal')"
+              style="background-color: red"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-  </div>
-</div>
 
     <!-- Modal para ver conciliación -->
     <div
@@ -328,83 +504,136 @@
               type="button"
               class="btn-close"
               @click="closeModal('nuevaOrdenModal')"
-              style="background-color: red;"
-            >
-          </button>
+              style="background-color: red"
+            ></button>
           </div>
 
           <div class="modal-body">
             <div class="mb-3">
               <label for="choferInput" class="form-label">Chofer</label>
-              <select v-model="selectedDriver" class="form-select" id="choferInput">
-              <option v-for="driver in drivers" :key="driver.id" :value="driver.id">
-               {{ driver.nombre }} {{ driver.apellido }}
-              </option>
-              </select>
-            </div>
-
-            <div class="mb-3">
-              <label for="clienteInput" class="form-label">Cliente</label>
-              <select v-model="selectedClient" class="form-select" id="clienteInput">
-                <option v-for="client in clients" :key="client.id" :value="client.id">
-              {{ client.razonSocial }}
-              </option>
-              </select>
-            </div>
-
-            <div class="mb-3">
-              <label for="camionInput" class="form-label">Camión</label>
-              <select v-model="selectedTruck" class="form-select" id="camionInput">
-                <option v-for="truck in trucks" :key="truck.id" :value="truck.id">
-                {{ truck.patente }}
-              </option>
-              </select>
-              </div>
-
-            <div class="mb-3">
-              <label for="productoInput" class="form-label">Producto</label>
-              <select v-model="selectedProduct" class="form-select" id="productoInput">
-                <option v-for="product in products" :key="product.id" :value="product.id">
-                {{ product.nombre }}
+              <select
+                v-model="selectedDriver"
+                class="form-select"
+                id="choferInput"
+              >
+                <option
+                  v-for="driver in drivers"
+                  :key="driver.id"
+                  :value="driver.id"
+                >
+                  {{ driver.nombre }} {{ driver.apellido }}
                 </option>
               </select>
             </div>
 
             <div class="mb-3">
-            <label for="fechaInput" class="form-label">Fecha</label>
+              <label for="clienteInput" class="form-label">Cliente</label>
+              <select
+                v-model="selectedClient"
+                class="form-select"
+                id="clienteInput"
+              >
+                <option
+                  v-for="client in clients"
+                  :key="client.id"
+                  :value="client.id"
+                >
+                  {{ client.razonSocial }}
+                </option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="camionInput" class="form-label">Camión</label>
+              <select
+                v-model="selectedTruck"
+                class="form-select"
+                id="camionInput"
+              >
+                <option
+                  v-for="truck in trucks"
+                  :key="truck.id"
+                  :value="truck.id"
+                >
+                  {{ truck.patente }}
+                </option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="productoInput" class="form-label">Producto</label>
+              <select
+                v-model="selectedProduct"
+                class="form-select"
+                id="productoInput"
+              >
+                <option
+                  v-for="product in products"
+                  :key="product.id"
+                  :value="product.id"
+                >
+                  {{ product.nombre }}
+                </option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="fechaInput" class="form-label">Fecha</label>
               <div class="d-flex align-items-center">
-              <datepicker id="calendario" v-model="fechaSeleccionada"></datepicker>
-            </div>
+                <datepicker
+                  id="calendario"
+                  v-model="fechaSeleccionada"
+                ></datepicker>
+              </div>
               <label for="horaInput" class="form-label mt-3">Horario</label>
-            <div class="d-flex align-items-center">
-            <select id="horaInput" v-model="selectedHour" class="form-select ml-2" style="width: 80px;">
-            <option v-for="hour in hours" :key="hour" :value="hour">
-              {{ hour < 10 ? '0' + hour : hour }}
-             </option>
-             </select>
-          <select v-model="selectedMinute" class="form-select ml-2" style="width: 80px;">
-            <option v-for="minute in minutes" :key="minute" :value="minute">
-        {{ minute < 10 ? '0' + minute : minute }}
-            </option>
-             </select>
-          </div>
-            <label for="presetInput" class="form-label mt-3">Preset</label>
-           <input id="presetInput" v-model.number="preset" type="number" class="form-control">
+              <div class="d-flex align-items-center">
+                <select
+                  id="horaInput"
+                  v-model="selectedHour"
+                  class="form-select ml-2"
+                  style="width: 80px"
+                >
+                  <option v-for="hour in hours" :key="hour" :value="hour">
+                    {{ hour < 10 ? "0" + hour : hour }}
+                  </option>
+                </select>
+                <select
+                  v-model="selectedMinute"
+                  class="form-select ml-2"
+                  style="width: 80px"
+                >
+                  <option
+                    v-for="minute in minutes"
+                    :key="minute"
+                    :value="minute"
+                  >
+                    {{ minute < 10 ? "0" + minute : minute }}
+                  </option>
+                </select>
+              </div>
+              <label for="presetInput" class="form-label mt-3">Preset</label>
+              <input
+                id="presetInput"
+                v-model.number="preset"
+                type="number"
+                class="form-control"
+              />
             </div>
-       </div>
+          </div>
 
           <div class="modal-footer justify-content-center">
             <div class="blackButtons">
               <button type="button" class="btn btn-primary" @click="sendOrder">
-              Aceptar
+                Aceptar
               </button>
             </div>
-            
+
             <button
               type="button"
               class="btn btn-secondary"
               @click="closeModal('nuevaOrdenModal')"
-            id="closeButton">
+              id="closeButton"
+            >
               Cancelar
             </button>
           </div>
@@ -423,8 +652,8 @@ import "vue3-toastify/dist/index.css";
 import Datepicker from "vue3-datepicker";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { format, parseISO } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { format, parseISO } from "date-fns";
+import { es } from "date-fns/locale";
 
 export default {
   components: {
@@ -451,28 +680,33 @@ export default {
       selectedProduct: null,
       selectedHour: 0,
       selectedMinute: 0,
-      hours: Array.from({length: 24}, (v, i) => i),
-      minutes: Array.from({length: 60}, (v, i) => i),
+      hours: Array.from({ length: 24 }, (v, i) => i),
+      minutes: Array.from({ length: 60 }, (v, i) => i),
       preset: null,
       detalle: {
         masaAcumulada: null,
-      densidadProducto: null,
-      temperaturaProducto: null,
-      caudal: null,
+        densidadProducto: null,
+        temperaturaProducto: null,
+        caudal: null,
       },
-      
+      fechaInicioFiltro: null,
+      fechaFinFiltro: null,
+      estado1Filtro: true,
+      estado2Filtro: true,
+      estado3Filtro: true,
+      estado4Filtro: true,
     };
   },
   async created() {
-  try {
-    this.drivers = await this.obtainDrivers();
-    this.clients = await this.obtainClients();
-    this.trucks = await this.obtainTrucks();
-    this.products = await this.obtainProducts();
-  } catch (error) {
-    console.error('Error obtaining data:', error);
-  }
-},
+    try {
+      this.drivers = await this.obtainDrivers();
+      this.clients = await this.obtainClients();
+      this.trucks = await this.obtainTrucks();
+      this.products = await this.obtainProducts();
+    } catch (error) {
+      console.error("Error obtaining data:", error);
+    }
+  },
   mounted() {
     this.selectedHour = 0;
     this.selectedMinute = 0;
@@ -491,8 +725,7 @@ export default {
   },
   methods: {
     isOrderInAlerts(orderId) {
-      
-      return this.alarms.some(alarm => alarm.orden.id === orderId);
+      return this.alarms.some((alarm) => alarm.orden.id === orderId);
     },
     async obtainAlarms() {
       try {
@@ -513,65 +746,65 @@ export default {
       }
     },
     async agregarDetalle() {
-  try {
-    const detalle = {
-      masaAcumulada: this.detalle.masaAcumulada,
-      densidadProducto: this.detalle.densidadProducto,
-      temperaturaProducto: this.detalle.temperaturaProducto,
-      caudal: this.detalle.caudal,
-    };
+      try {
+        const detalle = {
+          masaAcumulada: this.detalle.masaAcumulada,
+          densidadProducto: this.detalle.densidadProducto,
+          temperaturaProducto: this.detalle.temperaturaProducto,
+          caudal: this.detalle.caudal,
+        };
 
-    const response = await axios.post(
-      `${process.env.VUE_APP_API_URL}/orders/addDetalle`,
-      {
-        ...detalle,
-        orden: {
-          id: this.selectedOrder.id,
-        },
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${atob(Cookies.get("token"))}`,
-        },
+        const response = await axios.post(
+          `${process.env.VUE_APP_API_URL}/orders/addDetalle`,
+          {
+            ...detalle,
+            orden: {
+              id: this.selectedOrder.id,
+            },
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${atob(Cookies.get("token"))}`,
+            },
+          }
+        );
+        toast.success("Detalle agregado correctamente");
+        console.log("Detalle agregado:", response.data);
+        this.obtainOrders().then((data) => {
+          this.orders = data;
+        });
+        this.closeModal("agregarDetalleModal");
+      } catch (error) {
+        console.error("Error al agregar el detalle:", error);
       }
-    );
-    toast.success("Detalle agregado correctamente");
-    console.log("Detalle agregado:", response.data);
-    this.obtainOrders().then((data) => {
-      this.orders = data;
-    });
-    this.closeModal("agregarDetalleModal");
-  } catch (error) {
-    console.error("Error al agregar el detalle:", error);
-  }
-},
-async setPesajeFinal() {
-  try {
-    const pesajeFinal = parseFloat(this.pesoTexto);
-    const response = await axios.post(
-      `${process.env.VUE_APP_API_URL}/orders/setPesajeFinal`,
-      {},
-      {
-        params: {
-          id: this.selectedOrder.id,
-          pesajeFinal,
-        },
-        headers: {
-          Authorization: `Bearer ${atob(Cookies.get("token"))}`,
-        },
+    },
+    async setPesajeFinal() {
+      try {
+        const pesajeFinal = parseFloat(this.pesoTexto);
+        const response = await axios.post(
+          `${process.env.VUE_APP_API_URL}/orders/setPesajeFinal`,
+          {},
+          {
+            params: {
+              id: this.selectedOrder.id,
+              pesajeFinal,
+            },
+            headers: {
+              Authorization: `Bearer ${atob(Cookies.get("token"))}`,
+            },
+          }
+        );
+        toast.success("Pesaje final establecido correctamente");
+        console.log("Pesaje final establecido:", response.data);
+        this.obtainOrders().then((data) => {
+          this.orders = data;
+        });
+        this.closeModal("pesajeFinalModal");
+      } catch (error) {
+        toast.error("Hubo un error al establecer el pesaje final");
+        console.error("Error al establecer el pesaje final:", error);
       }
-    );
-    toast.success("Pesaje final establecido correctamente");
-    console.log("Pesaje final establecido:", response.data);
-    this.obtainOrders().then((data) => {
-      this.orders = data;
-    });
-    this.closeModal("pesajeFinalModal");
-  } catch (error) {
-    toast.error("Hubo un error al establecer el pesaje final");
-    console.error("Error al establecer el pesaje final:", error);
-  }
-},
+    },
     async finalizarCarga() {
       try {
         const response = await axios.put(
@@ -589,7 +822,7 @@ async setPesajeFinal() {
         toast.success("Carga finalizada correctamente");
         console.log("Carga finalizada:", response.data);
         this.obtainOrders().then((data) => {
-        this.orders = data;
+          this.orders = data;
         });
         this.closeModal("finalizarCargaModal");
       } catch (error) {
@@ -597,153 +830,170 @@ async setPesajeFinal() {
       }
     },
     formatDate(date) {
-      return format(parseISO(date), "d 'de' MMMM yyyy, HH:mm'HS'", { locale: es });
+      return format(parseISO(date), "d 'de' MMMM yyyy, HH:mm'HS'", {
+        locale: es,
+      });
     },
     async setPesajeInicial() {
-  try {
-    const response = await axios.post(
-      `${process.env.VUE_APP_API_URL}/orders/setPesajeInicial`,
-      {},
-      {
-        params: {
-          id: this.selectedOrder.id,
-          pesajeInicial: this.pesoTexto,
-        },
-        headers: {
-          Authorization: `Bearer ${atob(Cookies.get("token"))}`,
-        },
+      try {
+        const response = await axios.post(
+          `${process.env.VUE_APP_API_URL}/orders/setPesajeInicial`,
+          {},
+          {
+            params: {
+              id: this.selectedOrder.id,
+              pesajeInicial: this.pesoTexto,
+            },
+            headers: {
+              Authorization: `Bearer ${atob(Cookies.get("token"))}`,
+            },
+          }
+        );
+        toast.success("Pesaje inicial establecido correctamente");
+        console.log("Pesaje inicial establecido:", response.data);
+        this.obtainOrders().then((data) => {
+          this.orders = data;
+        });
+        this.closeModal("pesarCamionModal");
+      } catch (error) {
+        console.error("Error al establecer el pesaje inicial:", error);
       }
-    );
-    toast.success("Pesaje inicial establecido correctamente");
-    console.log("Pesaje inicial establecido:", response.data);
-    this.obtainOrders().then((data) => {
-      this.orders = data;
-    });
-    this.closeModal("pesarCamionModal");
-  } catch (error) {
-    console.error("Error al establecer el pesaje inicial:", error);
-  }
-},
-async sendOrder() {
-  let formattedDate = '';
-  if (this.fechaSeleccionada instanceof Date) {
-    formattedDate = `${this.fechaSeleccionada.toISOString().split('T')[0]}T${String(this.selectedHour).padStart(2, '0')}:${String(this.selectedMinute).padStart(2, '0')}:00`;
-  }
-
-  const order = {
-    camion: {
-      id: this.selectedTruck,
     },
-    chofer: {
-      id: this.selectedDriver,
-    },
-    cliente: {
-      id: this.selectedClient,
-    },
-    producto: {
-      id: this.selectedProduct,
-    },
-    fechaCargaPrevista: formattedDate,
-    preset: this.preset,
-  };
-
-  console.log("Enviando orden:", order);
-
-  try {
-    const response = await axios.post(
-      `${process.env.VUE_APP_API_URL}/orders`,
-      order,
-      {
-        headers: {
-          Authorization: `Bearer ${atob(Cookies.get("token"))}`,
-        },
+    async sendOrder() {
+      let formattedDate = "";
+      if (this.fechaSeleccionada instanceof Date) {
+        formattedDate = `${
+          this.fechaSeleccionada.toISOString().split("T")[0]
+        }T${String(this.selectedHour).padStart(2, "0")}:${String(
+          this.selectedMinute
+        ).padStart(2, "0")}:00`;
       }
-    );
-    toast.success("Orden creada correctamente");
-    console.log("Orden creada:", response.data);
-    this.obtainOrders().then((data) => {
-      this.orders = data;
-    });
-  } catch (error) {
-    toast.error("Hubo un error al crear la orden");
-    console.error("Error al crear la orden:", error);
-  }
-  this.closeModal("nuevaOrdenModal");
-},
-openModal(modalId, validateSelection = true) {
-  if (validateSelection) {
-    if (!this.selectedOrder) {
-      toast.error("Se debe seleccionar 1 orden obligatoriamente", {
-        timeout: 5000,
-      });
-      return;
-    }
 
-    
-
-    // Validaciones del estado de la orden
-    if (modalId === 'pesarCamionModal' && this.selectedOrder.estado !== 1) {
-      toast.error('No puede pesar el camión porque la orden está en estado ' + this.selectedOrder.estado);
-      return;
-    }
-
-    if ((modalId === 'agregarDetalleModal' || modalId === 'finalizarCargaModal') && this.selectedOrder.estado !== 2) {
-      toast.error('No puede realizar esta acción porque la orden está en estado ' + this.selectedOrder.estado);
-      return;
-    }
-
-    if (modalId === 'pesajeFinalModal' && this.selectedOrder.estado !== 3) {
-      toast.error('No puede realizar el pesaje final porque la orden está en estado ' + this.selectedOrder.estado);
-      return;
-    }
-  }
-
-  this.modalBackdropVisible = true;
-
-  this.$nextTick(() => {
-    const modal = document.getElementById(modalId);
-    modal.classList.add("show");
-  });
-},
-
-closeModal(modalId) {
-  this.selectedOrder = null;
-  this.pesoTexto = "";
-
-  // Limpiar los campos dependiendo del modal
-  switch(modalId) {
-    case 'pesarCamionModal':
-      this.pesoTexto = '';
-      break;
-    case 'agregarDetalleModal':
-      this.detalle = {
-        masaAcumulada: '',
-        densidadProducto: '',
-        temperaturaProducto: '',
-        caudal: ''
+      const order = {
+        camion: {
+          id: this.selectedTruck,
+        },
+        chofer: {
+          id: this.selectedDriver,
+        },
+        cliente: {
+          id: this.selectedClient,
+        },
+        producto: {
+          id: this.selectedProduct,
+        },
+        fechaCargaPrevista: formattedDate,
+        preset: this.preset,
       };
-      break;
-    case 'pesajeFinalModal':
-      this.pesoTexto = '';
-      break;
-    case 'nuevaOrdenModal':
-      this.selectedDriver = '';
-      this.selectedClient = '';
-      this.selectedTruck = '';
-      this.selectedProduct = '';
-      this.fechaSeleccionada = '';
-      this.selectedHour = '';
-      this.selectedMinute = '';
-      this.preset = '';
-      break;
-    default:
-      break;
-  }
 
-  const modal = document.getElementById(modalId);
-  modal.classList.remove("show");
-  this.modalBackdropVisible = false;
-},
+      console.log("Enviando orden:", order);
+
+      try {
+        const response = await axios.post(
+          `${process.env.VUE_APP_API_URL}/orders`,
+          order,
+          {
+            headers: {
+              Authorization: `Bearer ${atob(Cookies.get("token"))}`,
+            },
+          }
+        );
+        toast.success("Orden creada correctamente");
+        console.log("Orden creada:", response.data);
+        this.obtainOrders().then((data) => {
+          this.orders = data;
+        });
+      } catch (error) {
+        toast.error("Hubo un error al crear la orden");
+        console.error("Error al crear la orden:", error);
+      }
+      this.closeModal("nuevaOrdenModal");
+    },
+    openModal(modalId, validateSelection = true) {
+      if (validateSelection) {
+        if (!this.selectedOrder) {
+          toast.error("Se debe seleccionar 1 orden obligatoriamente", {
+            timeout: 5000,
+          });
+          return;
+        }
+
+        // Validaciones del estado de la orden
+        if (modalId === "pesarCamionModal" && this.selectedOrder.estado !== 1) {
+          toast.error(
+            "No puede pesar el camión porque la orden está en estado " +
+              this.selectedOrder.estado
+          );
+          return;
+        }
+
+        if (
+          (modalId === "agregarDetalleModal" ||
+            modalId === "finalizarCargaModal") &&
+          this.selectedOrder.estado !== 2
+        ) {
+          toast.error(
+            "No puede realizar esta acción porque la orden está en estado " +
+              this.selectedOrder.estado
+          );
+          return;
+        }
+
+        if (modalId === "pesajeFinalModal" && this.selectedOrder.estado !== 3) {
+          toast.error(
+            "No puede realizar el pesaje final porque la orden está en estado " +
+              this.selectedOrder.estado
+          );
+          return;
+        }
+      }
+
+      this.modalBackdropVisible = true;
+
+      this.$nextTick(() => {
+        const modal = document.getElementById(modalId);
+        modal.classList.add("show");
+      });
+    },
+
+    closeModal(modalId) {
+      this.selectedOrder = null;
+      this.pesoTexto = "";
+
+      // Limpiar los campos dependiendo del modal
+      switch (modalId) {
+        case "pesarCamionModal":
+          this.pesoTexto = "";
+          break;
+        case "agregarDetalleModal":
+          this.detalle = {
+            masaAcumulada: "",
+            densidadProducto: "",
+            temperaturaProducto: "",
+            caudal: "",
+          };
+          break;
+        case "pesajeFinalModal":
+          this.pesoTexto = "";
+          break;
+        case "nuevaOrdenModal":
+          this.selectedDriver = "";
+          this.selectedClient = "";
+          this.selectedTruck = "";
+          this.selectedProduct = "";
+          this.fechaSeleccionada = "";
+          this.selectedHour = "";
+          this.selectedMinute = "";
+          this.preset = "";
+          break;
+        default:
+          break;
+      }
+
+      const modal = document.getElementById(modalId);
+      modal.classList.remove("show");
+      this.modalBackdropVisible = false;
+    },
     toggleSort(key) {
       if (this.sortKey === key) {
         this.sortAsc = !this.sortAsc;
@@ -838,6 +1088,53 @@ closeModal(modalId) {
         return [];
       }
     },
+
+    openFilterModal() {
+      // Abre la ventana modal de filtro
+      this.$refs.filterModal.classList.add("show");
+      // Muestra el fondo oscuro del modal
+      this.modalBackdropVisible = true;
+    },
+    applyFilters() {
+      // Pasar las fechas a Date pattern = "yyyy-MM-dd HH:mm:ss"
+      if (this.fechaInicioFiltro) {
+        this.fechaInicioFiltro = `${this.fechaInicioFiltro} 00:00:00`;
+      }
+      if (this.fechaFinFiltro) {
+        this.fechaFinFiltro = `${this.fechaFinFiltro} 23:59:59`;
+      }
+
+      // Aplica los filtros y obtiene las órdenes filtradas
+      axios
+        .get(`${process.env.VUE_APP_API_URL}/orders/findByStateAndDate`, {
+          headers: {
+            Authorization: `Bearer ${atob(Cookies.get("token"))}`,
+          },
+          params: {
+            fechaIni: this.fechaInicioFiltro,
+            fechaFin: this.fechaFinFiltro,
+            state1: this.estado1Filtro,
+            state2: this.estado2Filtro,
+            state3: this.estado3Filtro,
+            state4: this.estado4Filtro,
+          },
+        })
+        .then((response) => {
+          this.orders = response.data;
+          console.log("Órdenes filtradas:", response.data);
+          this.closeFilterModal();
+        })
+        .catch((error) => {
+          console.error("Error al obtener las órdenes filtradas:", error);
+        });
+      this.closeFilterModal();
+    },
+    closeFilterModal() {
+      // Cierra la ventana modal de filtro
+      this.$refs.filterModal.classList.remove("show");
+      // Oculta el fondo oscuro del modal
+      this.modalBackdropVisible = false;
+    },
   },
 };
 </script>
@@ -904,5 +1201,8 @@ closeModal(modalId) {
 .table tbody tr:hover td {
   background-color: gray !important; /* Cambia esto al color gris que prefieras */
 }
-
+.checkboxes-inline .form-check {
+  display: inline-block;
+  margin-right: 50px; /* Espacio entre los checkboxes */
+}
 </style>
