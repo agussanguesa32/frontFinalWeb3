@@ -128,29 +128,39 @@
           </div>
         </div>
       </div>
-                    <!-- Modal alerta -->
+      <!-- Modal alerta -->
       <div class="modal" tabindex="-1" role="dialog" id="alertModal">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Alerta</h5>
-          <button
-              type="button"
-              class="btn-close"
-              @click="closeModal('alertModal')"
-              style="background-color: red"
-            ></button>
-        </div>
-        <div class="modal-body">
-          <p>¡La orden tiene una alerta!</p>
-          <input type="text" v-model="alertDescription" placeholder="Ingrese la descripción aquí">
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" @click="handleAlertAccept">Aceptar</button>
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Alerta</h5>
+              <button
+                type="button"
+                class="btn-close"
+                @click="closeModal('alertModal')"
+                style="background-color: red"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <p>¡La orden tiene una alerta!</p>
+              <input
+                type="text"
+                v-model="alertDescription"
+                placeholder="Ingrese la descripción aquí"
+              />
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-primary"
+                @click="handleAlertAccept"
+              >
+                Aceptar
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
     </div>
     <div class="m-3">
       <div class="d-flex justify-content-between align-items-start mt-4">
@@ -176,40 +186,48 @@
               </tr>
             </thead>
             <tbody>
-  <tr
-    v-for="(order, index) in sortedOrders"
-    :key="index"
-    :class="{ 'selected-row': selectedOrder === order }"
-    @click="selectedOrder = order"
-  >
-    <td>{{ order.id }}</td>
-    <td>
-  {{ order.estado }}
-  <i
-    class="fas fa-exclamation-triangle"
-    style="color: green"
-    v-if="acceptedAlarms.some(alarm => alarm.orden.id === order.id)"
-    @click="handleAlertClick"
-  ></i>
-  <i
-    class="fas fa-exclamation-triangle"
-    style="color: red"
-    v-if="unacceptedAlarms.some(alarm => alarm.orden.id === order.id)"
-    @click="handleAlertClick"
-  ></i>
-</td>
-    <td>{{ order.camion.patente }}</td>
-    <td>{{ order.preset }}</td>
-    <td>{{ order.chofer.apellido }}</td>
-    <td>{{ order.producto.nombre }}</td>
-    <td>{{ formatDate(order.fechaCargaPrevista) }}</td>
-  </tr>
-</tbody>
+              <tr
+                v-for="(order, index) in sortedOrders"
+                :key="index"
+                :class="{ 'selected-row': selectedOrder === order }"
+                @click="selectedOrder = order"
+              >
+                <td>{{ order.id }}</td>
+                <td>
+                  {{ order.estado }}
+                  <i
+                    class="fas fa-exclamation-triangle"
+                    style="color: green"
+                    v-if="
+                      acceptedAlarms.some(
+                        (alarm) => alarm.orden.id === order.id
+                      )
+                    "
+                    @click="handleAlertClick"
+                  ></i>
+                  <i
+                    class="fas fa-exclamation-triangle"
+                    style="color: red"
+                    v-if="
+                      unacceptedAlarms.some(
+                        (alarm) => alarm.orden.id === order.id
+                      )
+                    "
+                    @click="handleAlertClick"
+                  ></i>
+                </td>
+                <td>{{ order.camion.patente }}</td>
+                <td>{{ order.preset }}</td>
+                <td>{{ order.chofer.apellido }}</td>
+                <td>{{ order.producto.nombre }}</td>
+                <td>{{ formatDate(order.fechaCargaPrevista) }}</td>
+              </tr>
+            </tbody>
           </table>
         </div>
         <!-- Botones -->
         <div
-          class="d-flex flex-column flex-shrink-0 ml-3 mt-5 button-container blackButtons"
+          class="fixed-right d-none d-md-flex flex-column mt-5 button-container blackButtons"
         >
           <button
             class="btn custom-button mb-2"
@@ -699,7 +717,7 @@ export default {
       sortAsc: true,
       selectedOrder: null,
       pesoTexto: "",
-      alertDescription: '',
+      alertDescription: "",
       modalBackdropVisible: false,
       fechaSeleccionada: new Date(),
       drivers: [],
@@ -759,77 +777,81 @@ export default {
   },
   methods: {
     isAlarmAccepted(orderId) {
-  const alarm = this.alarms.find(alarm => alarm.ordenId === orderId);
+      const alarm = this.alarms.find((alarm) => alarm.ordenId === orderId);
 
-  // Si no se encuentra ninguna alarma para la orden, devolvemos false
-  if (!alarm) {
-    return false;
-  }
+      // Si no se encuentra ninguna alarma para la orden, devolvemos false
+      if (!alarm) {
+        return false;
+      }
 
-  // Si la alarma existe y su fechaAccepted es null, la alarma no ha sido aceptada
-  const isAccepted = alarm.fechaAccepted !== null;
+      // Si la alarma existe y su fechaAccepted es null, la alarma no ha sido aceptada
+      const isAccepted = alarm.fechaAccepted !== null;
 
-  // Imprime el resultado
-  console.log(`Alarma para la orden ${orderId} aceptada: ${isAccepted}`);
+      // Imprime el resultado
+      console.log(`Alarma para la orden ${orderId} aceptada: ${isAccepted}`);
 
-  return isAccepted;
-},
+      return isAccepted;
+    },
     async handleAlertAccept() {
-    try {
-      const response = await axios.post(
-        `${process.env.VUE_APP_API_URL}/alarm/accept`,
-        {},
-        {
-          params: {
-            ordenId: this.selectedOrder.id,
-            descripcion: this.alertDescription,
-          },
-          headers: {
-            Authorization: `Bearer ${atob(Cookies.get('token'))}`,
-          },
-        }
-      );
+      try {
+        const response = await axios.post(
+          `${process.env.VUE_APP_API_URL}/alarm/accept`,
+          {},
+          {
+            params: {
+              ordenId: this.selectedOrder.id,
+              descripcion: this.alertDescription,
+            },
+            headers: {
+              Authorization: `Bearer ${atob(Cookies.get("token"))}`,
+            },
+          }
+        );
 
-      console.log('Alerta aceptada:', response.data);
-      toast.success('Alerta aceptada correctamente');
-      this.obtainOrders().then((data) => {
-        this.orders = data;
-      });
-      this.closeModal('alertModal');
-    } catch (error) {
-      toast.error('Hubo un error al aceptar la alarma');
-      console.error('Error al aceptar la alerta:', error);
-    }
-  },
+        console.log("Alerta aceptada:", response.data);
+        toast.success("Alerta aceptada correctamente");
+        this.obtainOrders().then((data) => {
+          this.orders = data;
+        });
+        this.closeModal("alertModal");
+      } catch (error) {
+        toast.error("Hubo un error al aceptar la alarma");
+        console.error("Error al aceptar la alerta:", error);
+      }
+    },
     handleAlertClick() {
-      this.openModal('alertModal', false);
+      this.openModal("alertModal", false);
     },
     async obtainAlarms() {
-  try {
-    const response = await axios.get(
-      `${process.env.VUE_APP_API_URL}/alarm/list`,
-      {
-        headers: {
-          Authorization: `Bearer ${atob(Cookies.get("token"))}`,
-        },
+      try {
+        const response = await axios.get(
+          `${process.env.VUE_APP_API_URL}/alarm/list`,
+          {
+            headers: {
+              Authorization: `Bearer ${atob(Cookies.get("token"))}`,
+            },
+          }
+        );
+
+        this.alarms = response.data;
+
+        // Separamos las alarmas en aceptadas y no aceptadas
+        this.acceptedAlarms = this.alarms.filter(
+          (alarm) => alarm.fechaAccepted !== null
+        );
+        this.unacceptedAlarms = this.alarms.filter(
+          (alarm) => alarm.fechaAccepted === null
+        );
+
+        // Imprime las alarmas obtenidas
+        console.log("Alarmas obtenidas:", this.alarms);
+
+        return this.alarms;
+      } catch (error) {
+        console.error("Error al obtener las alarmas:", error);
+        return [];
       }
-    );
-
-    this.alarms = response.data;
-
-    // Separamos las alarmas en aceptadas y no aceptadas
-    this.acceptedAlarms = this.alarms.filter(alarm => alarm.fechaAccepted !== null);
-    this.unacceptedAlarms = this.alarms.filter(alarm => alarm.fechaAccepted === null);
-
-    // Imprime las alarmas obtenidas
-    console.log("Alarmas obtenidas:", this.alarms);
-
-    return this.alarms;
-  } catch (error) {
-    console.error("Error al obtener las alarmas:", error);
-    return [];
-  }
-},
+    },
     async agregarDetalle() {
       try {
         const detalle = {
@@ -1182,7 +1204,7 @@ export default {
       // Muestra el fondo oscuro del modal
       this.modalBackdropVisible = true;
     },
-    removeFilters(){
+    removeFilters() {
       this.fechaInicioFiltro = null;
       this.fechaFinFiltro = null;
       this.estado1Filtro = true;
@@ -1302,5 +1324,19 @@ export default {
 .checkboxes-inline .form-check {
   display: inline-block;
   margin-right: 50px; /* Espacio entre los checkboxes */
+}
+
+/* Estilo para hacer fijo el contenedor de los botones en la posición derecha */
+.fixed-right {
+  position: fixed;
+  top: max-width/2; /* Ajusta este valor según tus necesidades */
+  right: 20px; /* Ajusta este valor según tus necesidades */
+}
+
+/* Estilo para ocultar el contenedor de los botones en dispositivos pequeños */
+@media (max-width: 768px) {
+  .fixed-right {
+    display: none;
+  }
 }
 </style>
