@@ -158,10 +158,10 @@
           <table class="table">
             <thead>
               <tr>
-                <th @click="toggleSort('orden')">
+                <th @click="toggleSort('id')">
                   Orden
-                  <span v-if="sortKey === 'orden' && sortAsc">↑</span>
-                  <span v-else-if="sortKey === 'orden' && !sortAsc">↓</span>
+                  <span v-if="sortKey === 'id' && sortAsc">↑</span>
+                  <span v-else-if="sortKey === 'id' && !sortAsc">↓</span>
                 </th>
                 <th @click="toggleSort('estado')">
                   Estado
@@ -172,7 +172,7 @@
                 <th>Preset</th>
                 <th>Chofer</th>
                 <th>Producto</th>
-                <th>Fecha y Hora Prevista</th>
+                <th>Fecha y hora de carga prevista</th>
               </tr>
             </thead>
             <tbody>
