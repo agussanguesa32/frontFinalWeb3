@@ -129,20 +129,20 @@
         </div>
       </div>
       <!-- Modal alerta -->
-      <div class="modal" tabindex="-1" role="dialog" id="alertModal">
-        <div class="modal-dialog" role="document">
+      <div class="modal blackButtons" tabindex="-1" role="dialog" id="alertModal">
+        <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Alerta</h5>
+            <div class="modal-header" style="background-color: red; color: white;">
+              <h4 class="modal-title">¡ATENCION, la orden tiene una alarma activa!</h4>
               <button
-                type="button"
-                class="btn-close"
-                @click="closeModal('alertModal')"
-                style="background-color: red"
-              ></button>
+              type="button"
+              class="btn-close bnt-close-white"
+              @click="closeModal('alertModal')"
+              style="background-color: white"
+            ></button>
             </div>
             <div class="modal-body">
-              <p>¡La orden tiene una alerta!</p>
+              <p> De la aprobacion y deje una descripcion: </p>
               <input
                 type="text"
                 v-model="alertDescription"
@@ -201,9 +201,7 @@
                     v-if="
                       acceptedAlarms.some(
                         (alarm) => alarm.orden.id === order.id
-                      )
-                    "
-                    @click="handleAlertClick"
+                      )"
                   ></i>
                   <i
                     class="fas fa-exclamation-triangle"
@@ -1102,6 +1100,9 @@ export default {
       const modal = document.getElementById(modalId);
       modal.classList.remove("show");
       this.modalBackdropVisible = false;
+      this.obtainOrders().then((data) => {
+        this.orders = data;
+      });
     },
     toggleSort(key) {
       if (this.sortKey === key) {
