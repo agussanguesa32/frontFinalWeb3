@@ -151,7 +151,6 @@ export default {
   },
   created() {
   this.obtainAlarms();
-  this.alarmInterval = setInterval(this.obtainAlarms, 10000);
 },
   mounted() {
     this.connectWS();
@@ -164,7 +163,6 @@ export default {
   beforeUnmount() {
     // Clean up the WebSocket connection when the component is destroyed
     this.socket.close();
-    clearInterval(this.alarmInterval); // Limpia el intervalo cuando se destruye el componente
   },
 
   methods: {

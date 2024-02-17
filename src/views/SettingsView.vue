@@ -103,21 +103,35 @@ export default {
     };
   },
   async created() {
-    const token = atob(Cookies.get('token'));
-    const url = `${process.env.VUE_APP_API_URL}/configuration/getTemperaturaUmbral`;
+  const token = atob(Cookies.get('token'));
+  const url = `${process.env.VUE_APP_API_URL}/configuration/getTemperaturaUmbral`;
+  const urlRoles = `${process.env.VUE_APP_API_URL}/configuration/getAlarmReceptor`;
 
-    try {
-      const response = await axios.get(url, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+  try {
+    const response = await axios.get(url, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
 
-      this.temperature = response.data;
-    } catch (error) {
-      console.error(error);
-    }
-  },
+    this.temperature = response.data;
+
+    // Obtener la configuracion actual de los roles
+    const responseRoles = await axios.get(urlRoles, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    // Actualizar el valor de 'selected' para cada rol
+    this.roles.forEach(role => {
+      const roleFromApi = responseRoles.data.find(r => r.name === `ROLE_${role.name.toUpperCase()}`);
+      role.selected = !!roleFromApi;
+    });
+  } catch (error) {
+    console.error(error);
+  }
+},
   methods: {
     async updateEmailConfiguration() {
   const token = atob(Cookies.get('token'));
