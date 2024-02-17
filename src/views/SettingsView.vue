@@ -5,7 +5,7 @@
       <div class="card-container blackButtons">
         <div class="card">
           <div class="card-body d-flex flex-column">
-            <p class="card-text">Aquí puedes modificar los emails destino.</p>
+            <p class="card-text">Aquí puedes modificar a que personas se enviaran los Emails</p>
             <button @click="showEmailModal = true" class="btn btn-primary mt-auto">Modificar Emails</button>
           </div>
         </div>
@@ -29,19 +29,30 @@
             <button type="button" class="btn-close" @click="showEmailModal = false" style="background-color: red;"></button>
           </div>
 
-          <!-- Cuerpo del modal -->
-          <div class="modal-body text-center">
-            <p>Aquí puedes modificar los emails destino.</p>
-          </div>
-
+         <!-- Cuerpo del modal -->
+<div class="modal-body text-center">
+  <h5 class="mb-3">Configuración Emails</h5>
+  <div class="d-flex flex-wrap justify-content-between">
+    <div v-for="(role, index) in roles" :key="role.name" class="role-switch w-50" :class="{ 'mb-3': index < 2 }">
+      <p>{{ role.name }}</p>
+      <label class="switch">
+        <input type="checkbox" v-model="role.selected">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+</div>
           <!-- Pie del modal -->
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary">Aceptar</button>
-            <button type="button" class="btn btn-secondary" @click="showEmailModal = false" style="background-color: red;">Cancelar</button>
-          </div>
+
+<div class="modal-footer justify-content-center">
+  <button type="button" class="btn btn-primary" @click="updateEmailConfiguration">Aceptar</button>
+  <button type="button" class="btn btn-secondary" @click="showEmailModal = false" style="background-color: red;">Cancelar</button>
+</div>
         </div>
       </div>
     </div>
+
+
 
    <!-- Modal para modificar temperatura umbral -->
   <div v-if="showTemperatureModal" class="modal blackButtons" id="temperatureModal" tabindex="-1" aria-labelledby="temperatureModalLabel" aria-hidden="true">
@@ -60,7 +71,7 @@
         </div>
 
         <!-- Pie del modal -->
-        <div class="modal-footer">
+        <div class="modal-footer text-center">
           <button type="button" class="btn btn-primary" @click="updateTemperature">Aceptar</button>
           <button type="button" class="btn btn-secondary" @click="closeTemperatureModal" style="background-color: red;">Cancelar</button>
         </div>
@@ -82,7 +93,13 @@ export default {
       showEmailModal: false,
       showTemperatureModal: false,
       temperature: null,
-      newTemperature: null
+      newTemperature: null,
+      roles: [
+      { name: 'Admin', selected: false },
+      { name: 'Supervisor', selected: false },
+      { name: 'Balancista', selected: false },
+      { name: 'Secretario', selected: false }
+    ]
     };
   },
   async created() {
@@ -102,6 +119,32 @@ export default {
     }
   },
   methods: {
+    async updateEmailConfiguration() {
+  const token = atob(Cookies.get('token'));
+  const baseUrl = `${process.env.VUE_APP_API_URL}/configuration/setAlarmReceptor`;
+
+  const params = this.roles.reduce((acc, role) => {
+    acc[role.name.toLowerCase()] = role.selected;
+    return acc;
+  }, {});
+
+  const queryString = new URLSearchParams(params).toString();
+  const url = `${baseUrl}?${queryString}`;
+
+  try {
+    await axios.put(url, {}, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    toast.success('Configuración de emails actualizada correctamente.');
+    this.showEmailModal = false;
+  } catch (error) {
+    console.error(error);
+    toast.error('Ha ocurrido un error al actualizar la configuración de emails.');
+  }
+},
     async updateTemperature() {
       const token = atob(Cookies.get('token'));
       const url = `${process.env.VUE_APP_API_URL}/configuration/setTemperaturaUmbral?temperaturaUmbral=${this.newTemperature}`;
@@ -167,4 +210,59 @@ export default {
   .title{
     margin-top: 10px;
   }
+
+  .switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ca2222;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2ab934;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
   </style>

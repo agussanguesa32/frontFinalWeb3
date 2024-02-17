@@ -16,11 +16,23 @@
                 <p>Temperatura: {{ order.temperaturaProducto }}</p>
                 <p>Tiempo transcurrido: {{ order.tiempoTranscurrido }}</p>
                 <p>Preset: {{ order.preset }}</p>
-                <p>Masa acumulada: {{ order.masaAcumulada }}</p>
+                <p>Masa acumulada: {{ order.pesajeInicial }}</p>
                 <p>
                   Tiempo estimado restante: {{ order.tiempoRestanteEstimado }}
                 </p>
+                <div class="d-flex justify-content-center">
+                  <button
+                    class="btn custom-button mb-2"
+                    @click="openAlertModal(order)"
+                    v-if="hasActiveAlert(order)"
+                    style="background-color: red;"
+                    >
+                    Alerta
+                  </button>
+                </div>
+                
                 <div class="d-flex justify-content-center blackButtons">
+                  
                   <button
                     class="btn custom-button mb-2"
                     @click="openModal(order)"
@@ -29,6 +41,39 @@
                   </button>
                 </div>
               </div>
+              <!-- Modal alerta -->
+      <div class="modal blackButtons" tabindex="-1" role="dialog" id="alertModal">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header" style="background-color: red; color: white;">
+              <h4 class="modal-title">¡ATENCION, la orden tiene una alarma activa!</h4>
+              <button
+              type="button"
+              class="btn-close bnt-close-white"
+              @click="closeModal('alertModal')"
+              style="background-color: white"
+            ></button>
+            </div>
+            <div class="modal-body">
+              <p> De la aprobacion y deje una descripcion: </p>
+              <input
+                type="text"
+                v-model="alertDescription"
+                placeholder="Ingrese la descripción aquí"
+              />
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-primary"
+                @click="handleAlertAccept"
+              >
+                Aceptar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
               <!-- Modal para finalizar carga -->
               <div
                 class="modal blackButtons"
@@ -47,14 +92,14 @@
                       <button
                         type="button"
                         class="btn-close"
-                        @click="closeModal(order.id)"
+                        @click="closeModal('finalizarCargaModal' + order.id)"
                         style="background-color: red"
-                      ></button>
+                        ></button>
                     </div>
 
                     <!-- Cuerpo del modal -->
                     <div class="modal-body text-center">
-                      <p>Se cargaron {{ order.masaAcumulada }} Kg</p>
+                      <p>Se cargaron {{ order.pesajeInicial }} Kg</p>
                     </div>
 
                     <!-- Pie del modal -->
@@ -69,11 +114,11 @@
                       <button
                         type="button"
                         class="btn btn-secondary"
-                        @click="closeModal(order.id)"
+                        @click="closeModal('finalizarCargaModal' + order.id)"
                         style="background-color: red"
-                      >
+                        >
                         Cancelar
-                      </button>
+                        </button>
                     </div>
                   </div>
                 </div>
@@ -97,11 +142,17 @@ export default {
   data() {
     return {
       orders: [],
+      alarms: [],
       socket: null,
       modalBackdropVisible: false,
+      alertDescription: null, 
+      temperaturaProducto: null,
     };
   },
-
+  created() {
+  this.obtainAlarms();
+  this.alarmInterval = setInterval(this.obtainAlarms, 10000);
+},
   mounted() {
     this.connectWS();
 
@@ -113,9 +164,84 @@ export default {
   beforeUnmount() {
     // Clean up the WebSocket connection when the component is destroyed
     this.socket.close();
+    clearInterval(this.alarmInterval); // Limpia el intervalo cuando se destruye el componente
   },
 
   methods: {
+    openAlertModal(order) {
+    this.selectedOrder = order;
+    this.modalBackdropVisible = true;
+
+    this.$nextTick(() => {
+      const modal = document.getElementById("alertModal");
+      modal.classList.add("show");
+    });
+  },
+    async obtainAlarms() {
+  try {
+    const response = await axios.get(
+      `${process.env.VUE_APP_API_URL}/alarm/listByFechaAcceptedIsNull`,
+      {
+        headers: {
+          Authorization: `Bearer ${atob(Cookies.get("token"))}`,
+        },
+      }
+    );
+
+    this.alarms = response.data;
+
+    // Separamos las alarmas en aceptadas y no aceptadas
+    this.acceptedAlarms = this.alarms.filter(
+      (alarm) => alarm.fechaAccepted !== null
+    );
+    this.unacceptedAlarms = this.alarms.filter(
+      (alarm) => alarm.fechaAccepted === null
+    );
+
+    // Imprime las alarmas obtenidas
+    console.log("Alarmas obtenidas:", this.alarms);
+
+    return this.alarms;
+  } catch (error) {
+    console.error("Error al obtener las alarmas:", error);
+    toast.error("No se pudieron obtener las alarmas");
+    return [];
+  }
+},
+hasActiveAlert(order) {
+
+    const hasAlert = this.alarms.some(alarm => {
+    const isSameOrder = String(alarm.orden.id) === String(order.id);
+    const isNotAccepted = alarm.fechaAccepted === null;
+    return isSameOrder && isNotAccepted;
+  });
+  return hasAlert;
+},
+
+    async handleAlertAccept() {
+      try {
+        const response = await axios.post(
+          `${process.env.VUE_APP_API_URL}/alarm/accept`,
+          {},
+          {
+            params: {
+              ordenId: this.selectedOrder.id,
+              descripcion: this.alertDescription,
+            },
+            headers: {
+              Authorization: `Bearer ${atob(Cookies.get("token"))}`,
+            },
+          }
+        );
+
+        console.log("Alerta aceptada:", response.data);
+        toast.success("Alerta aceptada correctamente");
+        this.closeModal("alertModal");
+      } catch (error) {
+        toast.error("Hubo un error al aceptar la alarma");
+        console.error("Error al aceptar la alerta:", error);
+      }
+    },
     async finalizarCarga(order) {
       try {
         const response = await axios.put(
@@ -135,7 +261,7 @@ export default {
         this.obtainOrders().then((data) => {
           this.orders = data;
         });
-        this.closeModal(order.id);
+        this.closeModal('finalizarCargaModal');
       } catch (error) {
         console.error("Error al finalizar la carga:", error);
       }
@@ -143,8 +269,11 @@ export default {
 
     async connectWS() {
       // Create and connect the WebSocket
+      console.log(process.env.VUE_APP_API_WS_URL);
       this.socket = new WebSocket(`${process.env.VUE_APP_API_WS_URL}/chat`);
-
+      this.socket.onerror = function(event) {
+  console.error("WebSocket error observed:", event);
+};
       this.socket.onopen = () => {
         console.log("WebSocket connection established");
       };
@@ -164,6 +293,7 @@ export default {
           // Add new order to the orders array
           this.orders.push(message);
         }
+        this.obtainAlarms();
       };
 
       this.socket.onclose = () => {
@@ -188,25 +318,33 @@ export default {
     },
 
     openModal(order) {
-      // Validacion de orden con detalle
-      if (order.temperaturaProducto === null) {
-        toast.error("La orden aun no ha emitido ningun detalle");
-        return;
-      }
 
-      this.modalBackdropVisible = true;
+  // Check if the order exists and has a temperaturaProducto property
+  if (order && 'temperaturaProducto' in order) {
+    // Validacion de orden con detalle
+    if (order.temperaturaProducto === null) {
+      toast.error("La orden aun no ha emitido ningun detalle");
+      return;
+    }
 
-      this.$nextTick(() => {
-        const modal = document.getElementById("finalizarCargaModal" + order.id);
-        modal.classList.add("show");
-      });
-    },
+    this.modalBackdropVisible = true;
 
-    closeModal(orderId) {
-      const modal = document.getElementById("finalizarCargaModal" + orderId);
+    this.$nextTick(() => {
+      const modal = document.getElementById("finalizarCargaModal" + order.id);
+      modal.classList.add("show");
+    });
+  } else {
+    console.error(`Order not found or does not have a temperaturaProducto property`);
+  }
+},
+
+closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
       modal.classList.remove("show");
-      this.modalBackdropVisible = false;
-    },
+    }
+    this.modalBackdropVisible = false;
+  },
   },
 };
 </script>

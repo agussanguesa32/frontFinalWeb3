@@ -255,7 +255,7 @@
           </button>
           <button
             class="btn custom-button mb-2"
-            @click="openModal('verConciliacionModal')"
+            @click="getConciliacion"
           >
             Ver Conciliación
           </button>
@@ -521,20 +521,52 @@
     </div>
 
     <!-- Modal para ver conciliación -->
-    <div
-      v-if="selectedOrder"
-      class="modal blackButtons"
-      id="verConciliacionModal"
-      tabindex="-1"
-      aria-labelledby="verConciliacionModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <!-- Contenido del modal para ver conciliación, falta hacer -->
-        </div>
+<div
+  v-if="selectedOrder"
+  class="modal blackButtons"
+  id="verConciliacionModal"
+  tabindex="-1"
+  aria-labelledby="verConciliacionModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Conciliacion</h4>
+        <button
+          type="button"
+          class="btn-close"
+          @click="closeModal('verConciliacionModal')"
+          style="background-color: red"
+        ></button>
+      </div>
+      <div class="modal-body">
+  <h6>Orden: {{ selectedOrder.id }}</h6>
+  <h6>Camión: {{ selectedOrder.camion.patente }}</h6>
+  <h6 v-if="conciliacion">Pesaje Inicial: {{ conciliacion.pesajeInicial }}</h6>
+  <h6 v-if="conciliacion">Pesaje Final: {{ conciliacion.pesajeFinal }}</h6>
+  <h6 v-if="conciliacion">Producto Cargado: {{ conciliacion.productoCargado }}</h6>
+  <h6 v-if="conciliacion">Neto Por Balanza: {{ conciliacion.netoPorBalanza }}</h6>
+  <h6 v-if="conciliacion">Diferencia Entre Balanza y Caudalímetro: {{ conciliacion.diferenciaEntreBalanzaCaudalimetro }}</h6>
+  <h6 v-if="conciliacion">Promedio Temperatura: {{ conciliacion.promedioTemperatura }}</h6>
+  <h6 v-if="conciliacion">Promedio Densidad: {{ conciliacion.promedioDensidad }}</h6>
+  <h6 v-if="conciliacion">Promedio Caudal: {{ conciliacion.promedioCaudal }}</h6>
+  <h6 v-if="conciliacion">Fecha: {{ formatDate(conciliacion.fecha) }}</h6>
+</div>
+      <!-- Pie del modal -->
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          @click="closeModal('verConciliacionModal')"
+          style="background-color: red"
+        >
+          Cerrar
+        </button>
       </div>
     </div>
+  </div>
+</div>
 
     <!-- Modal para nueva orden -->
     <div
@@ -722,6 +754,7 @@ export default {
       clients: [],
       trucks: [],
       products: [],
+      conciliacion: null,
       acceptedAlarms: [],
       unacceptedAlarms: [],
       selectedTruck: null,
@@ -774,6 +807,23 @@ export default {
     },
   },
   methods: {
+    async getConciliacion() {
+    try {
+      const response = await axios.get(`${process.env.VUE_APP_API_URL}/orders/getConciliacion`, {
+        params: {
+          orderId: this.selectedOrder.id,
+        },
+        headers: {
+          Authorization: `Bearer ${atob(Cookies.get("token"))}`,
+        },
+      });
+
+      this.conciliacion = response.data;
+    } catch (error) {
+      console.error("Error al obtener la conciliación:", error);
+    }
+    this.openModal('verConciliacionModal');
+  },
     isAlarmAccepted(orderId) {
       const alarm = this.alarms.find((alarm) => alarm.ordenId === orderId);
 
@@ -1017,51 +1067,59 @@ export default {
       this.closeModal("nuevaOrdenModal");
     },
     openModal(modalId, validateSelection = true) {
-      if (validateSelection) {
-        if (!this.selectedOrder) {
-          toast.error("Se debe seleccionar 1 orden obligatoriamente", {
-            timeout: 5000,
-          });
-          return;
-        }
-
-        // Validaciones del estado de la orden
-        if (modalId === "pesarCamionModal" && this.selectedOrder.estado !== 1) {
-          toast.error(
-            "No puede pesar el camión porque la orden está en estado " +
-              this.selectedOrder.estado
-          );
-          return;
-        }
-
-        if (
-          (modalId === "agregarDetalleModal" ||
-            modalId === "finalizarCargaModal") &&
-          this.selectedOrder.estado !== 2
-        ) {
-          toast.error(
-            "No puede realizar esta acción porque la orden está en estado " +
-              this.selectedOrder.estado
-          );
-          return;
-        }
-
-        if (modalId === "pesajeFinalModal" && this.selectedOrder.estado !== 3) {
-          toast.error(
-            "No puede realizar el pesaje final porque la orden está en estado " +
-              this.selectedOrder.estado
-          );
-          return;
-        }
-      }
-
-      this.modalBackdropVisible = true;
-
-      this.$nextTick(() => {
-        const modal = document.getElementById(modalId);
-        modal.classList.add("show");
+  if (validateSelection) {
+    if (!this.selectedOrder) {
+      toast.error("Se debe seleccionar 1 orden obligatoriamente", {
+        timeout: 5000,
       });
-    },
+      return;
+    }
+
+    // Validaciones del estado de la orden
+    if (modalId === "pesarCamionModal" && this.selectedOrder.estado !== 1) {
+      toast.error(
+        "No puede pesar el camión porque la orden está en estado " +
+          this.selectedOrder.estado
+      );
+      return;
+    }
+
+    if (
+      (modalId === "agregarDetalleModal" ||
+        modalId === "finalizarCargaModal") &&
+      this.selectedOrder.estado !== 2
+    ) {
+      toast.error(
+        "No puede realizar esta acción porque la orden está en estado " +
+          this.selectedOrder.estado
+      );
+      return;
+    }
+
+    if (modalId === "pesajeFinalModal" && this.selectedOrder.estado !== 3) {
+      toast.error(
+        "No puede realizar el pesaje final porque la orden está en estado " +
+          this.selectedOrder.estado
+      );
+      return;
+    }
+
+    if (modalId === "verConciliacionModal" && this.selectedOrder.estado !== 4) {
+      toast.error(
+        "No puede ver la conciliación porque la orden está en estado " +
+          this.selectedOrder.estado
+      );
+      return;
+    }
+  }
+
+  this.modalBackdropVisible = true;
+
+  this.$nextTick(() => {
+    const modal = document.getElementById(modalId);
+    modal.classList.add("show");
+  });
+},
 
     closeModal(modalId) {
       this.selectedOrder = null;
