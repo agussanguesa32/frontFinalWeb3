@@ -214,10 +214,10 @@
                     @click="handleAlertClick"
                   ></i>
                 </td>
-                <td>{{ order.camion.patente }}</td>
+                <td>{{ order.patenteCamion }}</td>
                 <td>{{ order.preset }}</td>
-                <td>{{ order.chofer.apellido }}</td>
-                <td>{{ order.producto.nombre }}</td>
+                <td>{{ order.apellidoChofer }}</td>
+                <td>{{ order.nombreProducto }}</td>
                 <td>{{ formatDate(order.fechaCargaPrevista) }}</td>
               </tr>
             </tbody>
@@ -944,7 +944,7 @@ export default {
           {
             params: {
               id: this.selectedOrder.id,
-              pesajeFinal,
+              pesajefinal: pesajeFinal,
             },
             headers: {
               Authorization: `Bearer ${atob(Cookies.get("token"))}`,
