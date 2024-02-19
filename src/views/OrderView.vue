@@ -944,7 +944,7 @@ export default {
           {
             params: {
               id: this.selectedOrder.id,
-              pesajefinal: pesajeFinal,
+              pesajeFinal,
             },
             headers: {
               Authorization: `Bearer ${atob(Cookies.get("token"))}`,
