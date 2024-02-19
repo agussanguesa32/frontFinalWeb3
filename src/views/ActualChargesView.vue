@@ -16,7 +16,7 @@
                 <p>Temperatura: {{ order.temperaturaProducto }}</p>
                 <p>Tiempo transcurrido: {{ order.tiempoTranscurrido }}</p>
                 <p>Preset: {{ order.preset }}</p>
-                <p>Masa acumulada: {{ order.pesajeInicial }}</p>
+                <p>Masa acumulada: {{ order.masaAcumulada }}</p>
                 <p>
                   Tiempo estimado restante: {{ order.tiempoRestanteEstimado }}
                 </p>
