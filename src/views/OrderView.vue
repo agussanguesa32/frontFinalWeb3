@@ -293,7 +293,7 @@
           </div>
           <div class="modal-body">
             <h6>Orden: {{ selectedOrder.id }}</h6>
-            <h6>Camión: {{ selectedOrder.camion.patente }}</h6>
+            <h6>Camión: {{ selectedOrder.patenteCamion }}</h6>
             <div class="form-group">
               <label for="pesoInput">Peso:</label>
               <input
@@ -484,7 +484,7 @@
           <div class="modal-body">
             <h6>Orden: {{ selectedOrder.id }}</h6>
             <!-- Access the id property directly -->
-            <h6>Camión: {{ selectedOrder.camion.patente }}</h6>
+            <h6>Camión: {{ selectedOrder.patenteCamion }}</h6>
             <!-- Access the patente property of the camion -->
             <div class="form-group">
               <label for="pesoInput">Peso:</label>
@@ -542,7 +542,7 @@
       </div>
       <div class="modal-body">
   <h6>Orden: {{ selectedOrder.id }}</h6>
-  <h6>Camión: {{ selectedOrder.camion.patente }}</h6>
+  <h6>Camión: {{ selectedOrder.patenteCamion }}</h6>
   <h6 v-if="conciliacion">Pesaje Inicial: {{ conciliacion.pesajeInicial }}</h6>
   <h6 v-if="conciliacion">Pesaje Final: {{ conciliacion.pesajeFinal }}</h6>
   <h6 v-if="conciliacion">Producto Cargado: {{ conciliacion.productoCargado }}</h6>

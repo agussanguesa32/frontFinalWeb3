@@ -13,12 +13,12 @@
                 <h5>Orden {{ order.id }}</h5>
               </div>
               <div class="card-body">
-                <p>Temperatura: {{ order.temperaturaProducto }}</p>
+                <p>Temperatura: {{ order.temperatura }}</p>
                 <p>Tiempo transcurrido: {{ order.tiempoTranscurrido }}</p>
                 <p>Preset: {{ order.preset }}</p>
                 <p>Masa acumulada: {{ order.masaAcumulada }}</p>
                 <p>
-                  Tiempo estimado restante: {{ order.tiempoRestanteEstimado }}
+                  Tiempo estimado restante: {{ order.tiempoRestante }}
                 </p>
                 <div class="d-flex justify-content-center">
                   <button
