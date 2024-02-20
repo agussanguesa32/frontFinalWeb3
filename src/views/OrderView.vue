@@ -925,10 +925,10 @@ export default {
         );
         toast.success("Detalle agregado correctamente");
         console.log("Detalle agregado:", response.data);
+        await this.obtainAlarms();
         await this.obtainOrders().then((data) => {
           this.orders = data;
         });
-        await this.obtainAlarms();
         this.closeModal("agregarDetalleModal");
       } catch (error) {
         console.error("Error al agregar el detalle:", error);
@@ -1275,39 +1275,45 @@ export default {
       });
     },
     applyFilters() {
-      // Pasar las fechas a Date pattern = "yyyy-MM-dd HH:mm:ss"
-      if (this.fechaInicioFiltro) {
-        this.fechaInicioFiltro = `${this.fechaInicioFiltro} 00:00:00`;
-      }
-      if (this.fechaFinFiltro) {
-        this.fechaFinFiltro = `${this.fechaFinFiltro} 23:59:59`;
-      }
+  // Verifica si fechaInicioFiltro o fechaFinFiltro son null
+  if (!this.fechaInicioFiltro || !this.fechaFinFiltro) {
+    toast.error('Se deben seleccionar obligatoriamente fechas de inicio y fin para filtrar las órdenes');
+    return;
+  }
 
-      // Aplica los filtros y obtiene las órdenes filtradas
-      axios
-        .get(`${process.env.VUE_APP_API_URL}/orders/findByStateAndDate`, {
-          headers: {
-            Authorization: `Bearer ${atob(Cookies.get("token"))}`,
-          },
-          params: {
-            fechaIni: this.fechaInicioFiltro,
-            fechaFin: this.fechaFinFiltro,
-            state1: this.estado1Filtro,
-            state2: this.estado2Filtro,
-            state3: this.estado3Filtro,
-            state4: this.estado4Filtro,
-          },
-        })
-        .then((response) => {
-          this.orders = response.data;
-          console.log("Órdenes filtradas:", response.data);
-          this.closeFilterModal();
-        })
-        .catch((error) => {
-          console.error("Error al obtener las órdenes filtradas:", error);
-        });
+  // Pasar las fechas a Date pattern = "yyyy-MM-dd HH:mm:ss"
+  if (this.fechaInicioFiltro) {
+    this.fechaInicioFiltro = `${this.fechaInicioFiltro} 00:00:00`;
+  }
+  if (this.fechaFinFiltro) {
+    this.fechaFinFiltro = `${this.fechaFinFiltro} 23:59:59`;
+  }
+
+  // Aplica los filtros y obtiene las órdenes filtradas
+  axios
+    .get(`${process.env.VUE_APP_API_URL}/orders/findByStateAndDate`, {
+      headers: {
+        Authorization: `Bearer ${atob(Cookies.get("token"))}`,
+      },
+      params: {
+        fechaIni: this.fechaInicioFiltro,
+        fechaFin: this.fechaFinFiltro,
+        state1: this.estado1Filtro,
+        state2: this.estado2Filtro,
+        state3: this.estado3Filtro,
+        state4: this.estado4Filtro,
+      },
+    })
+    .then((response) => {
+      this.orders = response.data;
+      console.log("Órdenes filtradas:", response.data);
       this.closeFilterModal();
-    },
+    })
+    .catch((error) => {
+      console.error("Error al obtener las órdenes filtradas:", error);
+    });
+  this.closeFilterModal();
+},
     closeFilterModal() {
       // Cierra la ventana modal de filtro
       this.$refs.filterModal.classList.remove("show");

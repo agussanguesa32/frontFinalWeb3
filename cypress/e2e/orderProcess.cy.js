@@ -74,6 +74,13 @@ cy.get('.btn:nth-child(4)').click();
 cy.get('#pesajeFinalModal #pesoInput').click();
 cy.get('#pesajeFinalModal #pesoInput').type('100');
 cy.get('#pesajeFinalModal .btn-primary').click();
+cy.get('table tbody tr').filter((index, row) => {
+  const cells = Cypress.$(row).find('td');
+  const patenteCamion = cells.eq(2).text(); // Asume que la columna 'Camión' es la tercera columna
+  const estado = cells.eq(1).text(); // Asume que la columna 'Estado' es la segunda columna
+  return patenteCamion.includes('BGS345') && estado.includes('4');
+}).first().click();
+cy.get('.btn:nth-child(5)').click();
 
 
   })
